@@ -436,6 +436,7 @@ ScreenManager:
                                     id: infotext
                                     text: "Thermodynamic Cycle"
                                     size_hint: 0.95, None
+                                    height: dp(900)
                                     pos_hint: {"x":0.025,"top":1}
                                     theme_text_color: "Custom"
                                     text_color: (0.28, 0.39, 0.63, 1)
@@ -579,6 +580,8 @@ ScreenManager:
     gwp100field:gwp100field
     odpfield:odpfield
     ashrae34field:ashrae34field
+    fluidtypetext:fluidtypetext
+    fluidtypeimage:fluidtypeimage
     mflowtext:mflowtext
     mflowminus:mflowminus
     mflow:mflow
@@ -792,14 +795,14 @@ ScreenManager:
             MDCard:
                 orientation: "vertical"
                 size_hint: 1,None
-                height: dp(250)
+                height: dp(450)
                 allow_stretch: True
-                keep_ratio: False
+                keep_ratio: True
 
                 Image:
                     id: fluidtypeimage
-                    allow_stretch: False
-                    keep_ratio: False
+                    allow_stretch: True
+                    keep_ratio: True
                     source:"Ts_Dry.png"
 
 <Thermotab2>:

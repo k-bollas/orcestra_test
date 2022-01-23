@@ -23,6 +23,8 @@ import time
 from kivymd.uix.tab import MDTabsBase
 from kivy.uix.boxlayout import BoxLayout
 import config as cf
+import os
+os.environ["KIVY_NO_CONFIG"] = "1"
 
 Window.fullscreen = True
 
