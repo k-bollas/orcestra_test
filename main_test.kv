@@ -58,8 +58,8 @@ ScreenManager:
                                     color: (1,1,1,1)
                                     
                                 Image:
-                                    allow_stretch: False
-                                    keep_ratio: False
+                                    allow_stretch: True
+                                    keep_ratio: True
                                     source:"ORCFigureLayout.JPG"
                                     
                                 MDSeparator:
@@ -101,7 +101,7 @@ ScreenManager:
                                 size_hint: 1,None
                                 height:dp(260)
                                 allow_stretch: True
-                                keep_ratio: False
+                                keep_ratio: True
 
                                 MDLabel:
                                     text: "Velocity Triangles"
@@ -118,8 +118,8 @@ ScreenManager:
                                     color: (1,1,1,1)
                                     
                                 Image:
-                                    allow_stretch: False
-                                    keep_ratio: False
+                                    allow_stretch: True
+                                    keep_ratio: True
                                     source:"VelocityTriangles.png"
 
                                 MDSeparator:
@@ -163,7 +163,7 @@ ScreenManager:
                                 size_hint: 1,None
                                 height:dp(453)
                                 allow_stretch: True
-                                keep_ratio: False
+                                keep_ratio: True
 
                                 MDLabel:
                                     text: "Stator Design"
@@ -180,8 +180,8 @@ ScreenManager:
                                     color: (1,1,1,1)
   
                                 Image:
-                                    allow_stretch: False
-                                    keep_ratio: False
+                                    allow_stretch: True
+                                    keep_ratio: True
                                     source:"StatorBladeImage.png"
 
                                 MDSeparator:
@@ -415,8 +415,8 @@ ScreenManager:
                                     
                                 Image:
                                     id: infoimage
-                                    allow_stretch: False
-                                    keep_ratio: False
+                                    allow_stretch: True
+                                    keep_ratio: True
                                     source:"ORCFigureLayout.JPG"
                                     
                             MDSeparator:
@@ -428,7 +428,7 @@ ScreenManager:
                                 orientation: "vertical"
                                 padding: dp(8)
                                 size_hint: 1,None
-                                height: 45223*Window.width**(-0.822)
+                                height: dp(600)
                                 allow_stretch: True
                                 keep_ratio: True
                                     
@@ -436,7 +436,6 @@ ScreenManager:
                                     id: infotext
                                     text: "Thermodynamic Cycle"
                                     size_hint: 0.95, None
-                                    height: 45223*Window.width**(-0.822)
                                     pos_hint: {"x":0.025,"top":1}
                                     theme_text_color: "Custom"
                                     text_color: (0.28, 0.39, 0.63, 1)
