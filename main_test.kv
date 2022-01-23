@@ -37,7 +37,7 @@ ScreenManager:
                         
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1, None
                                 size: dp(350), dp(350) 
                                 allow_stretch: True
@@ -54,7 +54,7 @@ ScreenManager:
                                     text_color: (0.28, 0.39, 0.63, 1)
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 Image:
@@ -63,7 +63,7 @@ ScreenManager:
                                     source:"ORCFigureLayout.JPG"
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRectangleFlatIconButton:
@@ -79,7 +79,7 @@ ScreenManager:
                                                                             
                   
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRaisedButton:
@@ -92,12 +92,12 @@ ScreenManager:
                                         root.manager.transition.direction = "left"
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
                                 height:dp(260)
                                 allow_stretch: True
@@ -114,7 +114,7 @@ ScreenManager:
                                     text_color: (0.19, 0.64, 0.20, 1)
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 Image:
@@ -123,7 +123,7 @@ ScreenManager:
                                     source:"VelocityTriangles.png"
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRectangleFlatIconButton:
@@ -141,7 +141,7 @@ ScreenManager:
 
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRaisedButton:
@@ -154,12 +154,12 @@ ScreenManager:
                                         
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
                                 height:dp(453)
                                 allow_stretch: True
@@ -176,7 +176,7 @@ ScreenManager:
                                     text_color: (0.90, 0.36, 0.0, 1)
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
   
                                 Image:
@@ -185,7 +185,7 @@ ScreenManager:
                                     source:"StatorBladeImage.png"
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRectangleFlatIconButton:
@@ -203,7 +203,7 @@ ScreenManager:
 
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRaisedButton:
@@ -215,12 +215,12 @@ ScreenManager:
                                     on_release: root.manager.current = 'statordes'
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
                                 height:dp(340)
                                 allow_stretch: True
@@ -237,7 +237,7 @@ ScreenManager:
                                     text_color: (0.48, 0.0, 0.80, 1)
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 Image:
@@ -246,7 +246,7 @@ ScreenManager:
                                     source:"RotorBladeImage.png"
 
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRectangleFlatIconButton:
@@ -263,7 +263,7 @@ ScreenManager:
                                         root.manager.transition.direction = "left"
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
                                     
                                 MDRaisedButton:
@@ -277,21 +277,21 @@ ScreenManager:
                                         root.manager.transition.direction = "left"
                                     
                                 MDSeparator:
-                                    height: "10dp"
+                                    height: dp(10)
                                     color: (1,1,1,1)
 
         MDNavigationDrawer:
             id: nav_drawer
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                padding: "8dp"
-                spacing: "8dp"
+                padding: dp(8)
+                spacing: dp(8)
 
                 MDLabel:
                     text: "ORCestra/ Main Page"
                     font_style: "H6"
                     size_hint: 1, None
-                    height: "40dp"
+                    height: dp(40)
                     pos_hint: {"x":0.05,"top":1}
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
@@ -300,7 +300,7 @@ ScreenManager:
                     id: avatar
                     size_hint: (1,None)
                     source: "ORCestra_white_1080.png"
-                    height: "200dp"
+                    height: dp(200)
                 
                 ScrollView:
                     DrawerList:
@@ -407,7 +407,7 @@ ScreenManager:
                             
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
                                 height: dp(205)
                                 allow_stretch: True
@@ -420,13 +420,13 @@ ScreenManager:
                                     source:"ORCFigureLayout.JPG"
                                     
                             MDSeparator:
-                                height: "10dp"
+                                height: dp(10)
                                 color: (1,1,1,1)
                                     
                             MDCard:
                                 id: infocard
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
                                 height: 45223*Window.width**(-0.822)
                                 allow_stretch: True
@@ -482,14 +482,14 @@ ScreenManager:
             id: nav_drawer_thermo
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                padding: "8dp"
-                spacing: "8dp"
+                padding: dp(8)
+                spacing: dp(8)
                 
                 MDLabel:
                     text: "ORCestra/ Thermodynamic Cycle"
                     font_style: "H6"
                     size_hint: 1, None
-                    height: "40dp"
+                    height: dp(40)
                     pos_hint: {"x":0.05,"top":1}
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
@@ -498,7 +498,7 @@ ScreenManager:
                     id: avatar
                     size_hint: (1,None)
                     source: "ORCFigureLayout.JPG"
-                    height: "200dp"
+                    height: dp(200)
                     
                 ScrollView:
                     DrawerList:
@@ -614,7 +614,7 @@ ScreenManager:
                     
                 MDGridLayout:
                     cols: 1
-                    height:"30dp"
+                    height: dp(30)
                     adaptive_height: True
 
                     MDCard:
@@ -644,7 +644,7 @@ ScreenManager:
                             
                 MDGridLayout:
                     cols: 1
-                    height:"30dp"
+                    height:dp(30)
                     adaptive_height: True
 
                     MDCard:
@@ -674,7 +674,7 @@ ScreenManager:
 
                 MDGridLayout:
                     cols: 1
-                    height: "45dp"
+                    height: dp(45)
                     adaptive_height: True
                     
                     MDCard:
@@ -717,7 +717,7 @@ ScreenManager:
                                 root.mflowsldr.value = float(root.mflowsldr.value) + 0.2
                 MDGridLayout:
                     cols: 1
-                    height: "40dp"
+                    height: dp(40)
                     adaptive_height: True
 
                     MDCard:
@@ -758,7 +758,7 @@ ScreenManager:
 
                 MDGridLayout:
                     cols: 1
-                    height: "40dp"
+                    height: dp(40)
                     adaptive_height: True
 
                     MDCard:
@@ -856,7 +856,7 @@ ScreenManager:
 
                 MDGridLayout:
                     cols: 1
-                    height: "25dp"
+                    height: dp(25)
                     adaptive_height: True
                 
                     MDCard:
@@ -869,7 +869,7 @@ ScreenManager:
 
                 MDGridLayout:
                     cols: 1
-                    height: "45dp"
+                    height: dp(45)
                     adaptive_height: True
                     
                     MDCard:
@@ -911,7 +911,7 @@ ScreenManager:
 
                 MDGridLayout:
                     cols: 1
-                    height: "40dp"
+                    height: dp(40)
                     adaptive_height: True
 
                     MDCard:
@@ -950,7 +950,7 @@ ScreenManager:
 
                 MDGridLayout:
                     cols: 1
-                    height: "45dp"
+                    height: dp(45)
                     adaptive_height: True
                     
                     MDCard:
@@ -992,7 +992,7 @@ ScreenManager:
                                 root.ph1sldr.value = float(root.ph1sldr.value) + 0.2
                 MDGridLayout:
                     cols: 1
-                    height: "40dp"
+                    height: dp(40)
                     adaptive_height: True
 
                     MDCard:
@@ -1029,7 +1029,7 @@ ScreenManager:
                                 root.ph1sldr.value = round(float(root.ph1sldr.value),1)
                 MDGridLayout:
                     cols: 1
-                    height: "45dp"
+                    height: dp(45)
                     adaptive_height: True
                     
                     MDCard:
@@ -1072,7 +1072,7 @@ ScreenManager:
                         
                 MDGridLayout:
                     cols: 1
-                    height: "40dp"
+                    height: dp(40)
                     adaptive_height: True
 
                     MDCard:
@@ -1107,7 +1107,7 @@ ScreenManager:
                                 root.mhflow.text = "{:.2f}".format(round(float(root.mhflow.text),1))
                                 root.mhflowsldr.value = round(float(root.mhflowsldr.value),1)
                 OneLineIconListItem:
-                    height: "120dp"
+                    height: dp(120)
                     MDLabel:
                         text: "Hot fluid Outputs:"
                         font_style: "Button"
@@ -1147,7 +1147,7 @@ ScreenManager:
                         text_color: (0.28, 0.39, 0.63, 1)
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
                 height: Window.width*0.316239316
                 allow_stretch: True
@@ -1159,7 +1159,7 @@ ScreenManager:
                     source:"Evaporator.png"
             MDGridLayout:
                 cols: 1
-                height: "25dp"
+                height: dp(25)
                 adaptive_height: True
 
                 MDCard:
@@ -1173,7 +1173,7 @@ ScreenManager:
                     
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -1223,7 +1223,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -1259,7 +1259,7 @@ ScreenManager:
                             root.pinchevapsldr.value = round(float(root.pinchevapsldr.value),0)
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -1310,7 +1310,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -1346,7 +1346,7 @@ ScreenManager:
                             root.doshsldr.value = round(float(root.doshsldr.value),0)
 
             OneLineIconListItem:
-                height: "120dp"
+                height: dp(120)
                 on_release:
                     root.statepressed = 2
                     app.screen_helper.current = 'thermostate'
@@ -1402,7 +1402,7 @@ ScreenManager:
                     text_color: (0.28, 0.39, 0.63, 1)
 
             OneLineIconListItem:
-                height: "120dp"
+                height: dp(120)
                 on_release:
                     root.statepressed = 3
                     app.screen_helper.current = 'thermostate'
@@ -1462,7 +1462,7 @@ ScreenManager:
 
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
                 height: Window.width*0.316239316
                 allow_stretch: True
@@ -1474,7 +1474,7 @@ ScreenManager:
                     source:"TurbineIcon.png"
 
             OneLineIconListItem:
-                height: "120dp"
+                height: dp(120)
                 on_release:
                     root.statepressed = 4
                     app.screen_helper.current = 'thermostate'
@@ -1533,7 +1533,7 @@ ScreenManager:
                 md_bg_color: (0.60, 0.76, 1, 1)
 
             OneLineIconListItem:
-                height: "120dp"
+                height: dp(120)
                 on_release:
                     root.statepressed = 1
                     app.screen_helper.current = 'thermostate'
@@ -1589,7 +1589,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "25dp"
+                height: dp(25)
                 adaptive_height: True
 
                 MDCard:
@@ -1603,7 +1603,7 @@ ScreenManager:
                         
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -1652,7 +1652,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -1689,7 +1689,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -1738,7 +1738,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -1774,7 +1774,7 @@ ScreenManager:
                             root.doscsldr.value = round(float(root.doscsldr.value),0)
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
                 height: Window.width*0.427272727
                 allow_stretch: True
@@ -1793,7 +1793,7 @@ ScreenManager:
                 text_color: (0.28, 0.39, 0.63, 1)
             MDGridLayout:
                 cols: 1
-                height: "25dp"
+                height: dp(25)
                 adaptive_height: True
 
                 MDCard:
@@ -1806,7 +1806,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -1850,7 +1850,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "40dp"
+                height: dp(40)
                 adaptive_height: True
 
                 MDCard:
@@ -1889,7 +1889,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -1934,7 +1934,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "40dp"
+                height: dp(40)
                 adaptive_height: True
 
                 MDCard:
@@ -1972,7 +1972,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -2015,7 +2015,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "40dp"
+                height: dp(40)
                 adaptive_height: True
 
                 MDCard:
@@ -2051,7 +2051,7 @@ ScreenManager:
                             root.mwflowsldr.value = round(float(root.mwflowsldr.value),1)
 
             OneLineIconListItem:
-                height: "120dp"
+                height: dp(120)
                 MDLabel:
                     text: "Cold fluid Outputs:"
                     font_style: "Button"
@@ -2096,7 +2096,7 @@ ScreenManager:
 
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
                 height: Window.width*0.316239316
                 allow_stretch: True
@@ -2109,7 +2109,7 @@ ScreenManager:
                     
             MDGridLayout:
                 cols: 1
-                height: "25dp"
+                height: dp(25)
                 adaptive_height: True
 
                 MDCard:
@@ -2122,7 +2122,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -2165,7 +2165,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "40dp"
+                height: dp(40)
                 adaptive_height: True
 
                 MDCard:
@@ -2203,7 +2203,7 @@ ScreenManager:
                             root.npumpsldr.value = round(float(root.npumpsldr.value), 1)
 
             OneLineIconListItem:
-                height: "120dp"
+                height: dp(120)
                 on_release:
                     root.statepressed = 2
                     app.screen_helper.current = 'thermostate'
@@ -2260,12 +2260,12 @@ ScreenManager:
 <EvaporatorPropCustomSheet@BoxLayout>:
     orientation: "vertical"
     size_hint_y: None
-    height: "450dp"
+    height: dp(450)
 
     MDToolbar:
         title: root.title
         md_bg_color: (0.28, 0.39, 0.63, 1)
-        height: "60dp"
+        height: dp(60)
 
     ScrollView:
 
@@ -2274,7 +2274,7 @@ ScreenManager:
             adaptive_height: True
             
             OneLineIconListItem:
-                height:"240dp"
+                height: dp(240)
                 MDLabel:
                     text: root.text
                     theme_text_color: "Custom"
@@ -2286,7 +2286,7 @@ ScreenManager:
                 cols: 2
                 adaptive_height: True
                 OneLineIconListItem:
-                    height:"105dp"
+                    height: dp(105)
                     size_hint: 0.15, None
                     IconLeftWidget:
                         theme_text_color: "Custom"
@@ -2294,7 +2294,7 @@ ScreenManager:
                         icon: "restore"
 
                 OneLineIconListItem:
-                    height:"105dp"
+                    height: dp(105)
                     size_hint: 0.85, None
                     MDLabel:
                         text: "If you want to restore the parameter's value to the calculated value or the default one press the reset button"
@@ -2305,7 +2305,7 @@ ScreenManager:
                     
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
                 height: 275*Window.width/350
                 allow_stretch: True
@@ -2351,7 +2351,7 @@ ScreenManager:
                             adaptive_height: True
                             
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: temp
@@ -2362,7 +2362,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: pres
@@ -2373,7 +2373,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                             
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: rho
@@ -2384,7 +2384,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: vspec
@@ -2395,7 +2395,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: enth
@@ -2406,7 +2406,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: entr
@@ -2417,7 +2417,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
 
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: soundspeed
@@ -2428,7 +2428,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: comprfactor
@@ -2439,7 +2439,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: fundder
@@ -2450,7 +2450,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
                                     
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: cp
@@ -2461,7 +2461,7 @@ ScreenManager:
                                     pos_hint: {"x":0.10,"center_y":0.5}
 
                             OneLineIconListItem:
-                                height: "60dp"
+                                height: dp(60)
 
                                 MDLabel:
                                     id: cv
@@ -2498,9 +2498,9 @@ ScreenManager:
 
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
-                height:"100dp"
+                height: dp(100)
                 allow_stretch: True
                 keep_ratio: False
 
@@ -2515,13 +2515,13 @@ ScreenManager:
                 MDRoundFlatIconButton:
                     text: "Calculate"
                     icon: "calculator"
-                    font_size: "22dp"
+                    font_size: dp(22)
                     size_hint: None, None
                     size: dp(150), dp(50)
                     pos_hint: {"center_x":0.5,"center_y":0.5}
 
             OneLineIconListItem:
-                height: "30dp"
+                height: dp(30)
                 MDLabel:
                     text: "Results:"
                     font_style: "Button"
@@ -2594,13 +2594,13 @@ ScreenManager:
                     pos_hint: {"x":0.10,"center_y":0.5}
                     
             OneLineIconListItem:
-                height:"70dp"
+                height: dp(70)
                 MDFillRoundFlatIconButton:
                     text: "Go to Velocity Triangles"
                     icon: "arrow-right-thick"
-                    font_size: "17dp"
+                    font_size: dp(17)
                     size_hint: None, None
-                    height:"50dp"
+                    height: dp(50)
                     pos_hint: {"center_x":0.5,"center_y":0.5}
                     theme_text_color: "Custom"
                     md_bg_color:  (0.28, 0.39, 0.63, 1)
@@ -2643,14 +2643,14 @@ ScreenManager:
             id: nav_drawer_veltria
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                padding: "8dp"
-                spacing: "8dp"
+                padding: dp(8)
+                spacing: dp(8)
 
                 MDLabel:
                     text: "ORCestra/ Velocity Triangles"
                     font_style: "H6"
                     size_hint: 1, None
-                    height: "40dp"
+                    height: dp(40)
                     pos_hint: {"x":0.05,"top":1}
                     theme_text_color: "Custom"
                     text_color: (0.19, 0.64, 0.20, 1)
@@ -2659,7 +2659,7 @@ ScreenManager:
                     id: avatar
                     size_hint: (1,None)
                     source: "VelocityTriangles.png"
-                    height: "150dp"
+                    height: dp(150)
 
                 ScrollView:
                     DrawerList:
@@ -2777,7 +2777,7 @@ ScreenManager:
             
             MDCard:
                 orientation: "vertical"
-                padding: "8dp"
+                padding: dp(8)
                 size_hint: 1,None
                 height: Window.width*0.8140556
                 allow_stretch: True
@@ -2803,7 +2803,7 @@ ScreenManager:
                 
             MDGridLayout:
                 cols: 1
-                height: "60dp"
+                height: dp(60)
                 adaptive_height: True
 
                 MDCard:
@@ -2830,7 +2830,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "60dp"
+                height: dp(60)
                 adaptive_height: True
 
                 MDCard:
@@ -2857,7 +2857,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "60dp"
+                height: dp(60)
                 adaptive_height: True
 
                 MDCard:
@@ -2915,7 +2915,7 @@ ScreenManager:
             
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -2964,7 +2964,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3000,7 +3000,7 @@ ScreenManager:
                             
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -3049,7 +3049,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3092,7 +3092,7 @@ ScreenManager:
                 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -3144,7 +3144,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3184,7 +3184,7 @@ ScreenManager:
                                 
             MDGridLayout:
                 cols: 1
-                height: "40dp"
+                height: dp(40)
                 adaptive_height: True
 
                 MDCard:
@@ -3213,7 +3213,7 @@ ScreenManager:
                   
             MDGridLayout:
                 cols: 1
-                height: "25dp"
+                height: dp(25)
                 adaptive_height: True
 
                 MDCard:
@@ -3226,7 +3226,7 @@ ScreenManager:
 
             
             OneLineIconListItem:
-                height: "40dp"
+                height: dp(40)
                 on_release: root.Material_bottom_sheet()
                 
                 MDLabel:
@@ -3241,7 +3241,7 @@ ScreenManager:
             
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -3290,7 +3290,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3327,7 +3327,7 @@ ScreenManager:
 
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -3376,7 +3376,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3413,7 +3413,7 @@ ScreenManager:
             
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -3462,7 +3462,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3499,7 +3499,7 @@ ScreenManager:
                             
             MDGridLayout:
                 cols: 1
-                height: "45dp"
+                height: dp(45)
                 adaptive_height: True
 
                 MDCard:
@@ -3548,7 +3548,7 @@ ScreenManager:
             MDGridLayout:
                 cols: 1
                 adaptive_height: True
-                height: "40dp"
+                height: dp(40)
 
                 MDCard:
                     MDIconButton:
@@ -3586,12 +3586,12 @@ ScreenManager:
 <ContentCustomSheet@BoxLayout>:
     orientation: "vertical"
     size_hint_y: None
-    height: "200dp"
+    height: dp(200)
 
     MDToolbar:
         title: root.title
         md_bg_color: (0.19, 0.64, 0.20, 1)
-        height: "60dp"
+        height: dp(60)
 
     ScrollView:
 
@@ -3600,7 +3600,7 @@ ScreenManager:
             adaptive_height: True
             
             OneLineIconListItem:
-                height:"140dp"
+                height: dp(140)
                 MDLabel:
                     text: root.text
                     theme_text_color: "Custom"
@@ -3639,7 +3639,7 @@ ScreenManager:
 
                 MDCard:
                     orientation: "vertical"
-                    padding: "8dp"
+                    padding: dp(8)
                     allow_stretch: False
                     keep_ratio: False
 
@@ -3660,14 +3660,14 @@ ScreenManager:
 
 
             OneLineIconListItem:
-                height:"70dp"
+                height: dp(70)
                 MDFillRoundFlatIconButton:
                     text: "Calculate"
                     icon: "calculator"
-                    font_size: "22dp"
+                    font_size: dp(22)
                     size_hint : None, None
                     pos_hint: {"center_x":0.5,"center_y":0.5}
-                    height:"50dp"
+                    height: dp(50)
                     theme_text_color: "Custom"
                     md_bg_color:  (0.19, 0.64, 0.20, 1)
                     
@@ -3677,12 +3677,12 @@ ScreenManager:
                 specific_text_color: (0,0,0,1)
                 
             OneLineIconListItem:
-                height: "60dp"
+                height: dp(60)
                 MDFillRoundFlatIconButton:
                     text: "Stator Results"
                     icon: "chart-bar"
                     theme_text_color: "Custom"
-                    font_size: "16dp"
+                    font_size: dp(16)
                     text_color: (0.19, 0.64, 0.20, 1)
                     size_hint: None ,None
                     pos_hint: {"center_x":0.5,"center_y":0.5}
@@ -3691,12 +3691,12 @@ ScreenManager:
                     on_release: root.VelStator_dialog()
                     
             OneLineIconListItem:
-                height: "60dp"
+                height: dp(60)
                 MDFillRoundFlatIconButton:
                     text: "Rotor Results"
                     icon: "chart-bar"
                     theme_text_color: "Custom"
-                    font_size: "16dp"
+                    font_size: dp(16)
                     text_color: (0.19, 0.64, 0.20, 1)
                     size_hint: None ,None
                     pos_hint: {"center_x":0.5,"center_y":0.5}
@@ -3705,7 +3705,7 @@ ScreenManager:
                     on_release: root.VelRotor_dialog()
                     
             OneLineIconListItem:
-                height: "30dp"
+                height: dp(30)
                 MDLabel:
                     text: "Stage:"
                     font_style: "Button"
@@ -3804,26 +3804,26 @@ ScreenManager:
                     pos_hint: {"x":0.10,"center_y":0.5}
                     
             OneLineIconListItem:
-                height:"70dp"
+                height: dp(70)
                 MDFillRoundFlatIconButton:
                     text: "Go to Stator Design"
                     icon: "arrow-right-thick"
-                    font_size: "17dp"
+                    font_size: dp(17)
                     size_hint: None ,None
-                    height:"50dp"
+                    height: dp(50)
                     pos_hint: {"center_x":0.5,"center_y":0.5}
                     theme_text_color: "Custom"
                     md_bg_color:  (0.19, 0.64, 0.20, 1)
                     on_release: app.root.current = 'statordes'
                     
             OneLineIconListItem:
-                height:"70dp"
+                height: dp(70)
                 MDFillRoundFlatIconButton:
                     text: "Go to Rotor Design"
                     icon: "arrow-right-thick"
-                    font_size: "17dp"
+                    font_size: dp(17)
                     size_hint: None ,None
-                    height:"50dp"
+                    height: dp(50)
                     pos_hint: {"center_x":0.5,"center_y":0.5}
                     theme_text_color: "Custom"
                     md_bg_color:  (0.19, 0.64, 0.20, 1)
@@ -3865,7 +3865,7 @@ ScreenManager:
                             
                             MDGridLayout:
                                 cols: 1
-                                height: "25dp"
+                                height: dp(25)
                                 adaptive_height: True
 
                                 MDCard:
@@ -3886,7 +3886,7 @@ ScreenManager:
                                         
                             MDGridLayout:
                                 cols: 1
-                                height: "50dp"
+                                height:  dp(50)
                                 adaptive_height: True
 
                                 MDCard:
@@ -3916,7 +3916,7 @@ ScreenManager:
                                     
                             MDGridLayout:
                                 cols: 1
-                                height: "50dp"
+                                height:  dp(50)
                                 adaptive_height: True
 
                                 MDCard:
@@ -3945,7 +3945,7 @@ ScreenManager:
                                     
                             MDGridLayout:
                                 cols: 1
-                                height: "50dp"
+                                height:  dp(50)
                                 adaptive_height: True
 
                                 MDCard:
@@ -3974,7 +3974,7 @@ ScreenManager:
                                     
                             MDGridLayout:
                                 cols: 1
-                                height: "50dp"
+                                height:  dp(50)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4003,7 +4003,7 @@ ScreenManager:
                                     
                             MDGridLayout:
                                 cols: 1
-                                height: "50dp"
+                                height:  dp(50)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4032,7 +4032,7 @@ ScreenManager:
                                     
                             MDGridLayout:
                                 cols: 1
-                                height: "50dp"
+                                height:  dp(50)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4067,7 +4067,7 @@ ScreenManager:
                                 
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4118,7 +4118,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -4155,7 +4155,7 @@ ScreenManager:
                                     
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4206,7 +4206,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -4260,9 +4260,9 @@ ScreenManager:
             
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
-                                height:"7dp"
+                                height: dp(7)
                                 allow_stretch: True
                                 keep_ratio: False
 
@@ -4278,15 +4278,15 @@ ScreenManager:
                                     
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
-                                height: "60dp"
+                                height: dp(60)
                                                                 
                                 MDFillRoundFlatIconButton:
                                     icon: "calculator"
                                     text: "Calculate"
                                     theme_text_color: "Custom"
-                                    font_size: "22dp"
+                                    font_size: dp(22)
                                     size_hint : None, None
                                     pos_hint: {"center_x":0.5,"center_y":0.5}
                                     md_bg_color:  (0.90, 0.36, 0.0, 1)
@@ -4298,7 +4298,7 @@ ScreenManager:
                                 specific_text_color: (0,0,0,1)
                                 
                             OneLineIconListItem:
-                                height: "70dp"
+                                height:  dp(70)
                                 MDLabel:
                                     text: "Geometry:"
                                     font_style: "Button"
@@ -4324,7 +4324,7 @@ ScreenManager:
                                     
                                     
                             OneLineIconListItem:
-                                height: "50dp"
+                                height:  dp(50)
                                 MDLabel:
                                     text: "Solidity [-]:"
                                     theme_text_color: "Custom"
@@ -4341,7 +4341,7 @@ ScreenManager:
                                     text_color: (0.90, 0.36, 0.0, 1)
                                     
                             OneLineIconListItem:
-                                height: "50dp"
+                                height:  dp(50)
                                 MDLabel:
                                     text: "Chord to Height ratio [-]:"
                                     theme_text_color: "Custom"
@@ -4364,7 +4364,7 @@ ScreenManager:
 
                                 MDCard:
                                     orientation: "vertical"
-                                    padding: "8dp"
+                                    padding: dp(8)
                                     allow_stretch: False
                                     keep_ratio: False
 
@@ -4375,13 +4375,13 @@ ScreenManager:
                                         source:"StatorFigure.png"                                    
                                
                             OneLineIconListItem:
-                                height:"70dp"
+                                height: dp(70)
                                 MDFillRoundFlatIconButton:
                                     text: "Go to Rotor Design"
                                     icon: "arrow-right-thick"
-                                    font_size: "17dp"
+                                    font_size: dp(17)
                                     size_hint: None, None
-                                    height:"50dp"
+                                    height: dp(50)
                                     pos_hint: {"center_x":0.5,"center_y":0.5}
                                     theme_text_color: "Custom"
                                     md_bg_color:  (0.90, 0.36, 0.0, 1)
@@ -4392,14 +4392,14 @@ ScreenManager:
             id: nav_drawer_statordes
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                padding: "8dp"
-                spacing: "8dp"
+                padding: dp(8)
+                spacing: dp(8)
 
                 MDLabel:
                     text: "ORCestra / Stator Design"
                     font_style: "H6"
                     size_hint: 1, None
-                    height: "40dp"
+                    height: dp(40)
                     pos_hint: {"x":0.05,"top":1}
                     theme_text_color: "Custom"
                     text_color: (0.90, 0.36, 0.0, 1)
@@ -4408,7 +4408,7 @@ ScreenManager:
                     id: avatar
                     size_hint: (1,None)
                     source: "StatorBladeImage.png"
-                    height: "150dp"
+                    height: dp(150)
 
                 ScrollView:
                     DrawerList:
@@ -4486,12 +4486,12 @@ ScreenManager:
 <StatorBladeCustomSheet@BoxLayout>:
     orientation: "vertical"
     size_hint_y: None
-    height: "400dp"
+    height: dp(400)
 
     MDToolbar:
         title: "Blade Design"
         md_bg_color: (0.90, 0.36, 0.0, 1)
-        height: "60dp"
+        height: dp(60)
 
     MDGridLayout:
         cols: 2
@@ -4499,7 +4499,7 @@ ScreenManager:
         
         ScrollView:
             OneLineIconListItem:
-                height:"550dp"
+                height: dp(550)
                 MDLabel:
                     text: "Design the stator blades of turbine, regarding the calculations of the velocity triangles. Consindering the supersonic regime in ORC applications, the stator blade is divided in 3 distinct sectors: Inlet sector, convergent sector and divergent sector. Set the preferable design parameters in every blade sector, and combined with the calculated parameters from the velocity triangles, generate the prelimenary stator geometry. Finally, export the generated geometry in a completed coordinates text file."
                     theme_text_color: "Custom"
@@ -4509,9 +4509,9 @@ ScreenManager:
 
         MDCard:
             orientation: "vertical"
-            padding: "8dp"
+            padding: dp(8)
             size_hint: 1,None
-            height: "320dp"
+            height: dp(320)
             allow_stretch: True
             keep_ratio: False
             pos_hint: {"x":0,"top":1}
@@ -4524,12 +4524,12 @@ ScreenManager:
 <StatorSectionAbCustomSheet@BoxLayout>:
     orientation: "vertical"
     size_hint_y: None
-    height: "290dp"
+    height: dp(290)
 
     MDToolbar:
         title: "Mach number in ab'"
         md_bg_color: (0.90, 0.36, 0.0, 1)
-        height: "60dp"
+        height: dp(60)
 
     MDGridLayout:
         cols: 2
@@ -4537,7 +4537,7 @@ ScreenManager:
         
         ScrollView:
             OneLineIconListItem:
-                height:"290dp"
+                height:dp(290)
                 MDLabel:
                     text: "Select the Mach number in the section ab'. This section is the beginning of the convergent section. The Mach number in this section defines the diameter distribution in the convergent sector"
                     theme_text_color: "Custom"
@@ -4548,9 +4548,9 @@ ScreenManager:
 
         MDCard:
             orientation: "vertical"
-            padding: "8dp"
+            padding: dp(8)
             size_hint: 1,None
-            height: "230dp"
+            height: dp(230)
             allow_stretch: True
             keep_ratio: False
             pos_hint: {"x":0,"top":1}
@@ -4563,12 +4563,12 @@ ScreenManager:
 <StatorR2R1CustomSheet@BoxLayout>:
     orientation: "vertical"
     size_hint_y: None
-    height: "290dp"
+    height: dp(290)
 
     MDToolbar:
         title: "R2/R1 Ratio"
         md_bg_color: (0.90, 0.36, 0.0, 1)
-        height: "60dp"
+        height: dp(60)
 
     MDGridLayout:
         cols: 2
@@ -4581,7 +4581,7 @@ ScreenManager:
                 adaptive_height: True
 
                 OneLineIconListItem:
-                    height:"290dp"
+                    height:dp(290)
                     MDLabel:
                         text: "Select the ratio of radius R2 and radius R1. Radius R1 is calculated through the inlet Mach number, which has been already calculated and the Mach number in section ab'. Then radius R2 is calculated through the defined ratio. The ratio R2/R1 defines finally the total length and the size of the stator blade. "
                         theme_text_color: "Custom"
@@ -4592,9 +4592,9 @@ ScreenManager:
 
         MDCard:
             orientation: "vertical"
-            padding: "8dp"
+            padding: dp(8)
             size_hint: 1,None
-            height: "230dp"
+            height: dp(230)
             allow_stretch: True
             keep_ratio: False
             pos_hint: {"x":0,"top":1}
@@ -4651,7 +4651,7 @@ ScreenManager:
 
                             MDCard:
                                 orientation: "vertical"
-                                padding: "8dp"
+                                padding: dp(8)
                                 size_hint: 1,None
                                 height: dp(185)
                                 allow_stretch: True
@@ -4669,7 +4669,7 @@ ScreenManager:
 
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4720,7 +4720,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -4758,7 +4758,7 @@ ScreenManager:
 
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4810,7 +4810,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -4848,7 +4848,7 @@ ScreenManager:
                                             
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4901,7 +4901,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -4939,7 +4939,7 @@ ScreenManager:
 
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -4992,7 +4992,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -5031,7 +5031,7 @@ ScreenManager:
                                             
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -5083,7 +5083,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -5129,7 +5129,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "50dp"
+                                height:  dp(50)
 
                                 MDCard:
 
@@ -5156,7 +5156,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "50dp"
+                                height:  dp(50)
                                 
                                 MDCard:
 
@@ -5184,7 +5184,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "50dp"
+                                height:  dp(50)
                                 
                                 MDCard:
 
@@ -5212,7 +5212,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "50dp"
+                                height:  dp(50)
                                 
                                 MDCard:
 
@@ -5244,7 +5244,7 @@ ScreenManager:
 
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -5296,7 +5296,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -5336,7 +5336,7 @@ ScreenManager:
                                             
                             MDGridLayout:
                                 cols: 1
-                                height: "45dp"
+                                height: dp(45)
                                 adaptive_height: True
 
                                 MDCard:
@@ -5388,7 +5388,7 @@ ScreenManager:
                             MDGridLayout:
                                 cols: 1
                                 adaptive_height: True
-                                height: "40dp"
+                                height: dp(40)
 
                                 MDCard:
                                     MDIconButton:
@@ -5432,7 +5432,7 @@ ScreenManager:
                                 specific_text_color: (0,0,0,1)
 
                             OneLineIconListItem:
-                                height: "70dp"
+                                height:  dp(70)
                                 MDLabel:
                                     text: "Geometry:"
                                     font_style: "Button"
@@ -5457,7 +5457,7 @@ ScreenManager:
                                     text_color: (0.24, 0, 0.3, 1)
                                     
                             OneLineIconListItem:
-                                height: "50dp"
+                                height:  dp(50)
                                 MDLabel:
                                     text: "Pitch [mm]:"
                                     theme_text_color: "Custom"
@@ -5475,7 +5475,7 @@ ScreenManager:
                                     
                                     
                             OneLineIconListItem:
-                                height: "50dp"
+                                height:  dp(50)
                                 MDLabel:
                                     text: "Solidity [-]:"
                                     theme_text_color: "Custom"
@@ -5492,7 +5492,7 @@ ScreenManager:
                                     text_color: (0.24, 0, 0.3, 1)
                                     
                             OneLineIconListItem:
-                                height: "50dp"
+                                height:  dp(50)
                                 MDLabel:
                                     text: "Chord to Height ratio [-]:"
                                     theme_text_color: "Custom"
@@ -5509,7 +5509,7 @@ ScreenManager:
                                     text_color: (0.24, 0, 0.3, 1)
                                     
                             OneLineIconListItem:
-                                height: "50dp"
+                                height:  dp(50)
                                 MDLabel:
                                     text: "Sonic radius [mm]:"
                                     theme_text_color: "Custom"
@@ -5526,25 +5526,25 @@ ScreenManager:
                                     text_color: (0.24, 0, 0.3, 1)
 
                             OneLineIconListItem:
-                                height:"70dp"
+                                height: dp(70)
                                 MDFillRoundFlatIconButton:
                                     text: "Transition and Circular Arcs"
                                     icon: "chart-bar"
-                                    font_size: "16dp"
+                                    font_size: dp(16)
                                     size_hint : None,0.7
                                     pos_hint: {"center_x":0.5,"center_y":0.5}
-                                    height:"50dp"
+                                    height: dp(50)
                                     theme_text_color: "Custom"
                                     md_bg_color:  (0.24, 0, 0.3, 1)
 
                             OneLineIconListItem:
-                                height:"70dp"
+                                height: dp(70)
                                 MDFillRoundFlatIconButton:
                                     text: "Go back to Main Page"
                                     icon: "chevron-triple-left"
-                                    font_size: "17dp"
+                                    font_size: dp(17)
                                     size_hint: None, None
-                                    height:"50dp"
+                                    height: dp(50)
                                     pos_hint: {"center_x":0.5,"center_y":0.5}
                                     theme_text_color: "Custom"
                                     md_bg_color:  (0.24, 0, 0.3, 1)
@@ -5555,14 +5555,14 @@ ScreenManager:
             id: nav_drawer_rotordes
             ContentNavigationDrawer:
                 orientation: 'vertical'
-                padding: "8dp"
-                spacing: "8dp"
+                padding: dp(8)
+                spacing: dp(8)
 
                 MDLabel:
                     text: "ORCestra / Rotor Design"
                     font_style: "H6"
                     size_hint: 1, None
-                    height: "40dp"
+                    height: dp(40)
                     pos_hint: {"x":0.05,"top":1}
                     theme_text_color: "Custom"
                     text_color: (0.24, 0, 0.3, 1)
@@ -5571,7 +5571,7 @@ ScreenManager:
                     id: avatar
                     size_hint: (1,None)
                     source: "RotorBladeImage.png"
-                    height: "150dp"
+                    height: dp(150)
 
                 ScrollView:
                     DrawerList:
@@ -5649,12 +5649,12 @@ ScreenManager:
 <RotorCustomSheet@BoxLayout>:
     orientation: "vertical"
     size_hint_y: None
-    height: "250dp"
+    height: dp(250)
 
     MDToolbar:
         title: root.title
         md_bg_color: (0.24, 0, 0.3, 1)
-        height: "60dp"
+        height: dp(60)
 
     ScrollView:
 
@@ -5663,7 +5663,7 @@ ScreenManager:
             adaptive_height: True
             
             OneLineIconListItem:
-                height:"105dp"
+                height: dp(105)
                 MDLabel:
                     text: root.text
                     theme_text_color: "Custom"
@@ -5675,7 +5675,7 @@ ScreenManager:
                 cols: 2
                 adaptive_height: True
                 OneLineIconListItem:
-                    height:"105dp"
+                    height: dp(105)
                     size_hint: 0.15, None
                     IconLeftWidget:
                         theme_text_color: "Custom"
@@ -5683,7 +5683,7 @@ ScreenManager:
                         icon: "restore"
 
                 OneLineIconListItem:
-                    height:"105dp"
+                    height: dp(105)
                     size_hint: 0.85, None
                     MDLabel:
                         text: "If you want to restore the parameter's value to the calculated value or the default one press the reset button"
