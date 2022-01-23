@@ -19,7 +19,6 @@ from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.factory import Factory
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
-import numpy as np
 import time
 from kivymd.uix.tab import MDTabsBase
 from kivy.uix.boxlayout import BoxLayout
