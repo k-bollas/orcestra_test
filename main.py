@@ -24,7 +24,7 @@ from kivymd.uix.tab import MDTabsBase
 from kivy.uix.boxlayout import BoxLayout
 import config as cf
 
-Window.size = (350, 650)
+Window.fullscreen = True
 
 class Content(MDBoxLayout):
     pass
@@ -442,9 +442,9 @@ class VelTriatab2(BoxLayout, MDTabsBase):
                 ItemVelState(var="Relative Velocity Outlet W3 :",value=W3, units=" [m/s]"),
                 ItemVelState(var="Absolute Mach Outlet M3 :",value=M3, units=""),
                 ItemVelState(var="Absolute Velocity Outlet V3 :",value=V3, units=" [m/s]"),
-                ItemVelState(var="Relative Flow Inlet angle β2 :",value=b2, units=" [deg]"),
-                ItemVelState(var="Relative Flow Outlet angle β3 :",value=b3, units=" [deg] "),
-                ItemVelState(var="Absolute Flow Outlet angle α3 :",value=a3, units=" [deg] "),
+                ItemVelState(var="Relative Flow Inlet angle b2 :",value=b2, units=" [deg]"),
+                ItemVelState(var="Relative Flow Outlet angle b3 :",value=b3, units=" [deg] "),
+                ItemVelState(var="Absolute Flow Outlet angle a3 :",value=a3, units=" [deg] "),
             ],
             buttons=[MDFlatButton(text="GO BACK", text_color=(0.19, 0.64, 0.20, 1), on_release=self.close_dialog)],
             size_hint=(0.85,1))
@@ -482,7 +482,7 @@ class InformationScreen(Screen):
         return switcher.get(i)
     
     def card_height(self, i):
-        switcher={0:45223*Window.width**(-0.822),1:43821*Window.width**(-0.803),2:43821*Window.width**(-0.803),3:43821*Window.width**(-0.803)}
+        switcher={0:600,1:600,2:600,3:600}
         return switcher.get(i)
         
     def on_pre_enter(self, *args):
