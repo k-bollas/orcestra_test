@@ -25,6 +25,7 @@ from kivymd.uix.tab import MDTabsBase
 from kivy.uix.boxlayout import BoxLayout
 import config as cf
 import os
+from numpy import sqrt
 os.environ["KIVY_NO_CONFIG"] = "1"
 
 Window.fullscreen = True
@@ -292,7 +293,8 @@ class Thermotab3(BoxLayout, MDTabsBase):
         self.snackbar.open()
     
     def ThermCalculations(self):
-        time.sleep(3.5)            
+        time.sleep(3.5)
+        self.pr.text = "Pressure Ratio : {:.3f} [-]".format(sqrt(5))           
         self.ThermFinish()
         self.spinner_toggle()
             
