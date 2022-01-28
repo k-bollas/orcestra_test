@@ -20,6 +20,7 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivy.factory import Factory
 from kivymd.uix.bottomsheet import MDCustomBottomSheet
 import time
+import threading
 from kivymd.uix.tab import MDTabsBase
 from kivy.uix.boxlayout import BoxLayout
 import config as cf
@@ -276,7 +277,30 @@ class Thermotab3(BoxLayout, MDTabsBase):
     ThermCalcCompleted = ObjectProperty(None)
     thermotab1 = ObjectProperty(None)
     thermotab2 = ObjectProperty(None)
-    thermspinner = ObjectProperty(None)           
+    thermspinner = ObjectProperty(None)
+
+    @mainthread
+    def spinner_toggle(self):
+        if self.thermspinner.active == False:
+            self.thermspinner.active = True
+        else:
+            self.thermspinner.active = False
+     
+    @mainthread
+    def ThermFinish(self):
+        self.snackbar = Snackbar(text="Calculations completed!",snackbar_x="10dp",snackbar_y="10dp")
+        self.snackbar.open()
+    
+    def ThermCalculations(self):
+        time.sleep(3.5)            
+        self.ThermFinish()
+        self.spinner_toggle()
+            
+    def ThermCalculations_thread(self):
+        self.spinner_toggle()
+        self.therm_thread = threading.Thread(target=(self.ThermCalculations))
+        self.therm_thread.start()
+              
 
 
 class VelTriatab1(BoxLayout, MDTabsBase):
