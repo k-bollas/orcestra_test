@@ -26,6 +26,7 @@ from kivy.uix.boxlayout import BoxLayout
 import config as cf
 import os
 from numpy import sqrt
+from CoolProp.CoolProp import PropsSI
 os.environ["KIVY_NO_CONFIG"] = "1"
 
 Window.fullscreen = True
@@ -294,7 +295,9 @@ class Thermotab3(BoxLayout, MDTabsBase):
     
     def ThermCalculations(self):
         time.sleep(3.5)
-        self.pr.text = "Pressure Ratio : {:.3f} [-]".format(sqrt(5))           
+        self.pr.text = "Pressure Ratio : {:.3f} [-]".format(sqrt(5))
+        Wout = (PropsSI("H", "P", float(self.thermotab2.ph1.text)*1e5, "T", float(self.thermotab2.th1.text) + 273.15, "HEOS::ISOPENTANE") - PropsSI("H", "P", 101325, "T", 298.15, "HEOS::ISOPENTANE"))/1e3
+        self.wout.text = "Turbine Power Output : {:.2f} [kW]".format(Wout/1e3)
         self.ThermFinish()
         self.spinner_toggle()
             
