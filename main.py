@@ -25,11 +25,14 @@ from kivymd.uix.tab import MDTabsBase
 from kivy.uix.boxlayout import BoxLayout
 import config as cf
 import os
-from numpy import sqrt
-from scipy.optimize import fsolve
+from numpy import sqrt, polyval
+from thermo_cycle import Thermodynamic_Cycle
+import thermo_funcs as tf
+
 os.environ["KIVY_NO_CONFIG"] = "1"
 
-Window.fullscreen = True
+# Window.fullscreen = True
+Window.size = (350, 650)
 
 class Content(MDBoxLayout):
     pass
@@ -96,10 +99,10 @@ class Thermotab1(BoxLayout, MDTabsBase):
         
     def WorkingFluid_bottom_sheet(self):
         bottom_sheet_menu = MDListBottomSheet()
-        self.WorkingFluidData = ["Acetone", "Benzene", "Butane", "Cyclohexane", "Cyclopentane", "Cyclopropane", "D4", "D5", "D6", "Ethanol", "Heptane", "Isohexane", "Isopentane", "Isobutane", "MD2M", "MD3M", "MD4M", "MDM", "Methanol", "MM", "Nonane", "Octane", "Propane", "Propylene", "R11", "R12", "R13", "R14", "R21", "R22", "R23", "R32", "R41", "R113", "R114", "R115", "R116", "R123", "R124", "R125", "R134a", "R141b", "R142b", "R143a", "R152a", "R161", "R227ea", "R236ea", "R236fa", "R245fa", "R365mfc", "R1234yf", "R1234ze", "R404a", "RC318", "Toluene", "Water"]
-        self.WorkingFluidCoolProp = ["ACETONE", "BENZENE", "BUTANE", "CYCLOHEX", "CYCLOPEN", "CYCLOPRO", "D4", "D5", "D6", "ETHANOL", "HEPTANE", "IHEXANE", "IPENTANE", "ISOBUTAN", "MD2M", "MD3M", "MD4M", "MDM", "METHANOL", "MM", "NONANE", "OCTANE", "PROPANE", "PROPYLEN", "R11", "R12", "R13", "R14", "R21", "R22", "R23", "R32", "R41", "R113", "R114", "R115", "R116", "R123", "R124", "R125", "R134A", "R141B", "R142B", "R143A", "R152A", "R161", "R227EA", "R236EA", "R236FA", "R245FA", "R365MFC", "R1234YF", "R1234ZE", "R404A.MIX", "RC318", "TOLUENE", "WATER"]
+        self.WorkingFluidData = ["Isopentane"]
+        self.WorkingFluidCoolProp = ["IPENTANE"]
         
-        self.WorkingFluidType = ["Wet", "Dry", "Dry", "Dry", "Dry", "Wet", "Dry", "Dry", "Dry", "Wet", "Dry", "Dry", "Dry", "Dry", "Dry", "Dry", "Dry", "Dry", "Wet", "Dry", "Dry", "Dry", "Wet", "Wet", "Isentropic", "Wet", "Wet", "Wet", "Wet", "Wet", "Wet", "Wet", "Wet", "Dry", "Dry", "Dry", "Isentropic", "Dry", "Dry", "Isentropic", "Wet", "Dry", "Isentropic", "Wet", "Wet", "Wet", "Dry", "Dry", "Dry", "Dry", "Dry", "Isentropic", "Isentropic", "Wet", "Dry", "Dry", "Wet"]
+        self.WorkingFluidType = ["Dry"]
                 
         for i in range(0, len(self.WorkingFluidData)):
             bottom_sheet_menu.add_item(
@@ -205,67 +208,40 @@ class Thermotab2(BoxLayout, MDTabsBase):
         app = App.get_running_app()
         self.HeatSource = self.HeatSourceCoolProp[self.HeatSourceData.index(args[0])]
         self.heatsourcebutton.text = "Heat Source : {}".format(args[0])
-        if args[0] == "Industrial Gases":
+        if args[0] == "Exhaust Gases":
             self.dialog = MDDialog(
-                title="[color={}][b] Industrial Gases Composition [/b][/color]".format("#4863A0"),
-                type="simple",
+                title="[color={}][b] Composition [/b][/color]".format("#4863A0"),
+                type="confirmation",
                 items=[
                     ItemIndDialog(var="nN2",value="0.657"),
-                    ItemIndDialog(var="nCO2",value="0.158"),
+                    ItemIndDialog(var="nCO2",value="0.168"),
                     ItemIndDialog(var="nH2O",value="0.103"),
                     ItemIndDialog(var="nO2",value="0.072")],
                 buttons=[
-                    MDRaisedButton(text="OK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_and_save_ind),
+                    MDRaisedButton(text="OK", text_color=(1,1,1,1), on_release=self.close_and_save_ind),
                     MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),
                 ],size_hint=(0.75,1))
-            self.dialog.set_normal_height()
+            cf.comp_dialog = self.dialog
             self.dialog.open()
-            
+
     def close_dialog(self,obj):
         self.dialog.dismiss()
         
     def close_and_save_ind(self,obj):
+        [self.nN2, self.nCO2, self.nH2O, self.nO2] = [float(self.dialog.items[x].comptext.text) for x in range(0,len(self.dialog.items))]
+        print(self.nN2, self.nCO2, self.nH2O, self.nO2)
         self.dialog.dismiss()
         
     def HeatSource_bottom_sheet(self):
         bottom_sheet_menu = MDListBottomSheet()
-        self.HeatSourceData = ["Industrial Gases","Water/Steam","Hydrogen"]
-        self.HeatSourceCoolProp = ["NITROGEN&CO2&WATER&OXYGEN","WATER","HYDROGEN"]
+        self.HeatSourceData = ["Exhaust Gases","Water/Steam"]
+        self.HeatSourceCoolProp = ["NITROGEN&CO2&WATER&OXYGEN","WATER"]
         for i in range(0, len(self.HeatSourceData)):
             bottom_sheet_menu.add_item(
                 self.HeatSourceData[i],
                 lambda x, y=i: self.callback_for_heatsource_items(self.HeatSourceData[y]))
         bottom_sheet_menu.open()
-        
-    def Thermstate_dialog(self):
-        if self.thermotab3.ThermCalcCompleted == None:
-            rhovalue = "None"; vvalue = "None"; hvalue = "None"; svalue = "None"; cvalue = "None"; Zvalue = "None"; Gvalue = "None"; Cpvalue = "None"
-            Cvvalue = "None"
-        else:
-            rhovalue = "{:.2f}".format(self.rhostate[self.statepressed-1]); vvalue = "{:.3f}".format(self.vstate[self.statepressed-1])
-            hvalue = "{:.2f}".format(self.hstate[self.statepressed-1]); svalue = "{:.3f}".format(self.sstate[self.statepressed-1])
-            cvalue = "{:.2f}".format(self.cstate[self.statepressed-1]); Cpvalue = "{:.3f}".format(self.Cpstate[self.statepressed-1])
-            Zvalue = "{:.3f}".format(self.Zstate[self.statepressed-1]) if self.statepressed>=3 else self.Zstate[self.statepressed-1]
-            Gvalue = "{:.3f}".format(self.Gstate[self.statepressed-1]) if self.statepressed>=3 else self.Gstate[self.statepressed-1] 
-            Cvvalue = "{:.3f}".format(self.Cvstate[self.statepressed-1])
-        self.dialog = MDDialog(
-            title="[color={}][b] State {} [/b][/color]".format("#4863A0",str(self.statepressed)),
-            type="simple",
-            items=[
-                ItemThermState(var="Density :",value=rhovalue, units=" [kg/m3]"),
-                ItemThermState(var="Specific Volume :",value=vvalue, units=" [m3/kg]"),
-                ItemThermState(var="Enthalpy :",value=hvalue, units=" [kJ/kg]"),
-                ItemThermState(var="Entropy :",value=svalue, units=" [kJ/kg-K]"),
-                ItemThermState(var="Speed of sound :",value=cvalue, units=" [m/s]"),
-                ItemThermState(var="Compressibility Factor :",value=Zvalue, units=""),
-                ItemThermState(var="Foundamental Derivative :",value=Gvalue, units=""),
-                ItemThermState(var="Specific Heat Capacity Cp :",value=Cpvalue, units=" [kJ/kg-K]"),
-                ItemThermState(var="Specific Heat Capacity Cv :",value=Cvvalue, units=" [kJ/kg-K]")
-            ],
-            buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog)],
-            size_hint=(0.85,1))
-        self.dialog.open()
-        
+                
 class Thermotab3(BoxLayout, MDTabsBase):
     app = App.get_running_app()
     pr = ObjectProperty(None)
@@ -294,13 +270,68 @@ class Thermotab3(BoxLayout, MDTabsBase):
         self.snackbar.open()
     
     def ThermCalculations(self):
-        time.sleep(3.5)
-        self.pr.text = "Pressure Ratio : {:.3f} [-]".format(sqrt(5))
-        fun = lambda x: x**2 + 3*x - 2
-        x = float(fsolve(fun, 0))
-        self.wout.text = "Turbine Power Output : {:.3f} [kW]".format(x)
+        if self.thermotab1.WorkingFluid == None or self.thermotab2.HeatSource == None:
+            if self.thermotab1.WorkingFluid == None and self.thermotab2.HeatSource != None: textmsg = "Please select Working Fluid"
+            elif self.thermotab1.WorkingFluid != None and self.thermotab2.HeatSource == None: textmsg = "Please select Heat Source"
+            else: textmsg = "Please select Working Fluid and type of Heat Source"
+            self.dialog = MDDialog(
+            title="[color={}][b] Not Enough Inputs [/b][/color]".format("#4863A0"),
+            text=textmsg,
+            buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
+            self.dialog.open()
+            self.spinner_toggle()         
+            return
+
+        self.tc = Thermodynamic_Cycle()
+        self.tc.Th1, self.tc.Ph1 = float(self.thermotab2.th1.text) + 273.15, float(self.thermotab2.ph1.text)*1e5
+        self.tc.mh_flow = float(self.thermotab2.mhflow.text)
+        self.tc.fluid = self.thermotab1.WorkingFluid
+        self.tc.Tw1, self.tc.Pw1 = float(self.thermotab2.tw1.text) + 273.15, float(self.thermotab2.pw1.text)*1e5
+        self.tc.mw_flow = float(self.thermotab2.mwflow.text)
+        self.tc.Pinch_evap_init, self.tc.Pinch_cond__init = float(self.thermotab2.pinchevap.text), float(self.thermotab2.pinchcond.text)
+        self.tc.DoSC, self.tc.DoSH = float(self.thermotab2.dosc.text), float(self.thermotab2.dosh.text)
+        self.tc.y_exh = [0, 0, 1, 0] if self.thermotab2.HeatSource == "WATER" else [self.thermotab2.nN2, self.thermotab2.nCO2, self.thermotab2.nH2O, self.thermotab2.nO2]
+        self.tc.m_flow = float(self.thermotab1.mflow.text)
+
+        self.m_flow_max = self.tc.maximum_mass_flow()
+        if self.tc.m_flow <= self.m_flow_max:
+            if self.thermotab1.massflowopt.active == True:
+                self.tc.mass_flow_optimisation()
+            else:
+                self.tc.Cycle_Dry_States(self.tc.m_flow)
+            self.thermotab2.th2.text, self.thermotab2.ph2.text = "{:.2f}".format(self.tc.Th2-273.15), "{:.3f}".format(self.tc.Ph2/1e5)
+            self.thermotab2.tw2.text, self.thermotab2.pw2.text = "{:.2f}".format(self.tc.Tw2-273.15), "{:.3f}".format(self.tc.Pw2/1e5)
+            self.thermotab2.dosh.text, self.thermotab2.pinchevap.text = "{:.2f}".format(self.tc.DoSH), "{:.2f}".format(self.tc.Pinch_evap) 
+            self.thermotab2.t1.text, self.thermotab2.p1.text = "{:.2f}".format(self.tc.T1-273.15), "{:.3f}".format(self.tc.P1/1e5)
+            self.thermotab2.t2.text, self.thermotab2.p2.text = "{:.2f}".format(self.tc.T2-273.15), "{:.3f}".format(self.tc.P2/1e5)
+            self.thermotab2.t21.text, self.thermotab2.p21.text = "{:.2f}".format(self.tc.T2-273.15), "{:.3f}".format(self.tc.P2/1e5)
+            self.thermotab2.t3.text, self.thermotab2.p3.text = "{:.2f}".format(self.tc.T3-273.15), "{:.3f}".format(self.tc.P3/1e5)
+            self.thermotab2.t4.text, self.thermotab2.p4.text = "{:.2f}".format(self.tc.T4-273.15), "{:.3f}".format(self.tc.P4/1e5)
+            self.thermotab2.doshsldr.value, self.thermotab2.pinchevapsldr.value = float(self.tc.DoSH), float(self.tc.Pinch_evap)
+            self.pr.text = "Pressure Ratio : {:.3f} [-]".format(self.tc.PR)
+            self.wout.text = "Turbine Power Output : {:.2f} [kW]".format(self.tc.W_out/1e3)
+            self.win.text = "Pump Power Input : {:.2f} [kW]".format(self.tc.W_in/1e3); 
+            self.wnet.text = "Net Power Output : {:.2f} [kW]".format(self.tc.W_net/1e3)
+            self.qin.text = "Heat Duty : {:.2f} [kW]".format(self.tc.Q_in/1e3)
+            self.nth.text = "Thermal Efficiency : {:.2f} [%]".format(self.tc.nth*1e2)
+            self.ncarnot.text = "Carnot Efficiency : {:.2f} [%]".format(self.tc.n_carnot*1e2)
+            self.thermotab1.mflow.text = "{:.2f}".format(self.tc.m_flow)
+            self.thermotab1.mflowsldr.value = float(self.tc.m_flow)
+            self.ThermCalcCompleted = 'Completed'
+
+        else:
+            self.dialog = MDDialog(
+            title="[color={}][b] Calculation Error [/b][/color]".format("#4863A0"),
+            text="Too high mass flow. For the given inlet conditions mass flow can not be higher than {:.3f} kg/s".format(self.m_flow_max),
+            buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
+            self.dialog.open()  
+
+
         self.ThermFinish()
         self.spinner_toggle()
+
+    def close_dialog(self,obj):
+        self.dialog.dismiss()
             
     def ThermCalculations_thread(self):
         self.spinner_toggle()
@@ -531,6 +562,24 @@ class ItemIndDialog(OneLineIconListItem):
     value = StringProperty()
     id = StringProperty()
     nn2 = ObjectProperty(None)
+
+    def composition_check(self):
+        composition = [float(cf.comp_dialog.items[x].comptext.text) for x in range(0,len(cf.comp_dialog.items))]
+        if sum(composition) != 1:
+            self.comp_msg = Snackbar(text="Sum of gas composition is not 1",snackbar_x="10dp",snackbar_y="10dp")
+            self.comp_msg.open()
+
+    def correct_composition(self, var):
+        [nN2, nCO2, nH2O, nO2] = [float(cf.comp_dialog.items[x].comptext.text) for x in range(0,len(cf.comp_dialog.items))]
+        if var == "nN2":
+            cf.comp_dialog.items[0].comptext.text = "{:.3f}".format(1 - nCO2 - nH2O - nO2)
+        elif var =="nCO2":
+            cf.comp_dialog.items[1].comptext.text = "{:.3f}".format(1 - nN2 - nH2O - nO2)
+        elif var =="nH2O":
+            cf.comp_dialog.items[2].comptext.text = "{:.3f}".format(1 - nN2 - nCO2 - nO2)
+        elif var == "nO2":
+            cf.comp_dialog.items[3].comptext.text = "{:.3f}".format(1 - nN2 - nCO2 - nH2O)
+
     
 class ItemThermState(OneLineIconListItem):
     divider = None
@@ -626,17 +675,26 @@ class ThermoStateScreen(Screen):
             Tvalue = "None"; Pvalue = "None"; rhovalue = "None"; vvalue = "None"; hvalue = "None"; svalue = "None"; cvalue = "None"; Zvalue = "None"; Gvalue = "None"; Cpvalue = "None"
             Cvvalue = "None"
         else:
-            Tvalue = "{:.2f}".format(self.manager.screens[2].ids.thermotab2.Tstate[ self.manager.screens[2].ids.thermotab2.statepressed-1] - 273.15)
-            Pvalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.vstate[ self.manager.screens[2].ids.thermotab2.statepressed-1]/1e5)
-            rhovalue = "{:.2f}".format(self.manager.screens[2].ids.thermotab2.rhostate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
-            vvalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.vstate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
-            hvalue = "{:.2f}".format(self.manager.screens[2].ids.thermotab2.hstate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
-            svalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.sstate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
-            cvalue = "{:.2f}".format(self.manager.screens[2].ids.thermotab2.cstate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
-            Cpvalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.Cpstate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
-            Zvalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.Zstate[ self.manager.screens[2].ids.thermotab2.statepressed-1]) if self.manager.screens[2].ids.thermotab2.statepressed>=3 else self.manager.screens[2].ids.thermotab2.Zstate[self.manager.screens[2].ids.thermotab2.statepressed-1]
-            Gvalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.Gstate[ self.manager.screens[2].ids.thermotab2.statepressed-1]) if self.manager.screens[2].ids.thermotab2.statepressed>=3 else self.manager.screens[2].ids.thermotab2.Gstate[ self.manager.screens[2].ids.thermotab2.statepressed-1] 
-            Cvvalue = "{:.3f}".format(self.manager.screens[2].ids.thermotab2.Cvstate[ self.manager.screens[2].ids.thermotab2.statepressed-1])
+            fluid = self.manager.screens[2].ids.thermotab3.tc.fluid
+            Tstates = [self.manager.screens[2].ids.thermotab3.tc.T1, self.manager.screens[2].ids.thermotab3.tc.T2, self.manager.screens[2].ids.thermotab3.tc.T3, self.manager.screens[2].ids.thermotab3.tc.T4]
+            Pstates = [self.manager.screens[2].ids.thermotab3.tc.P1, self.manager.screens[2].ids.thermotab3.tc.P2, self.manager.screens[2].ids.thermotab3.tc.P3, self.manager.screens[2].ids.thermotab3.tc.P4]
+            Zstates = ["N/A in liquid phase", "N/A in liquid phase", round(self.manager.screens[2].ids.thermotab3.tc.Z3,3), round(self.manager.screens[2].ids.thermotab3.tc.Z4,3)]
+            Tvalue = "{:.2f}".format(Tstates[self.manager.screens[2].ids.thermotab2.statepressed - 1] - 273.15)
+            Pvalue = "{:.3f}".format(Pstates[self.manager.screens[2].ids.thermotab2.statepressed - 1]/1e5)
+            Zvalue = "{}".format(Zstates[self.manager.screens[2].ids.thermotab2.statepressed - 1])
+
+            rhovalue = tf.density_liquid('mass', fluid) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else tf.density(float(Pvalue)*1e5, float(Tvalue) + 273.15, fluid)
+            vvalue = 1/rhovalue
+            rhovalue, vvalue = "{:.3f}".format(rhovalue), "{:.3f}".format(vvalue)
+            hvalue = tf.enthalpy_liquid('mass', float(Pvalue)*1e5, float(Tvalue) + 273.15, 101325, 298.15, fluid) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else tf.enthalpy('mass', float(Pvalue)*1e5, float(Tvalue) + 273.15, 101325, 298.15, fluid)
+            svalue = tf.entropy_liquid('mass', float(Pvalue)*1e5, float(Tvalue) + 273.15, 101325, 298.15, fluid) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else tf.entropy('mass', float(Pvalue)*1e5, float(Tvalue) + 273.15, 101325, 298.15, fluid)
+            hvalue, svalue = "{:.2f}".format(hvalue/1e3), "{:.3f}".format(svalue/1e3)
+            Cpvalue = tf.ideal_cpmolar_liquid('mass',fluid,float(Tvalue) + 273.15) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else polyval(tf.ideal_cpmolar(fluid), float(Tvalue) + 273.15)/(tf.molar_mass(fluid)*1e-3)
+            Cvvalue = Cpvalue - 8314/tf.molar_mass(fluid)
+            Cpvalue, Cvvalue = "{:.3f}".format(Cpvalue/1e3), "{:.3f}".format(Cvvalue/1e3)
+            if self.manager.screens[2].ids.thermotab2.statepressed > 2: cvalue = tf.speed_of_sound(float(Pvalue)*1e5, float(Tvalue) + 273.15, fluid)
+            cvalue = "{:.3f}".format(cvalue) if self.manager.screens[2].ids.thermotab2.statepressed > 2 else "N/A in liquid phase"
+            Gvalue = "None"
         
         self.statebar.title = "State {}".format(self.manager.screens[2].ids.thermotab2.statepressed)
         self.temp.text = "Temperature : {} [C]".format(Tvalue)

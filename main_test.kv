@@ -441,6 +441,34 @@ ScreenManager:
                                     theme_text_color: "Custom"
                                     text_color: (0.28, 0.39, 0.63, 1)
 
+<ItemIndDialog>:
+    comptext:comptext
+
+    MDIconButton:
+        icon: "alarm-panel-outline"
+        pos_hint: {"x": 0.85, "center_y": .5}
+        theme_text_color: "Custom"
+        text_color: (0.28, 0.39, 0.63, 1)
+        on_release:
+            root.correct_composition(root.var)
+
+    MDLabel:
+        text: root.var
+        theme_text_color: "Custom"
+        text_color: 0.28, 0.39, 0.63, 1
+        pos_hint: {"x":0.15,"y":0.05}
+
+    MDTextFieldRect:
+        id: comptext
+        text: root.value
+        hint_text: "Enter value"
+        size_hint: 0.3,0.7
+        pos_hint: {"x":0.55,"y":0.15}
+        color_mode: 'custom'
+        line_color_focus: 0.28, 0.39, 0.63, 1
+        on_text:
+            root.composition_check()
+
 <ThermodynamicsScreen>:
     thermotab1:thermotab1
     thermotab2:thermotab2
@@ -826,7 +854,24 @@ ScreenManager:
     tw1:tw1
     tw1sldr:tw1sldr
     pw1:pw1
+    tw2:tw2
+    pw2:pw2
     pw1sldr:pw1sldr
+    t1:t1
+    p1:p1
+    t2:t2
+    p2:p2
+    t21:t21
+    p21:p21
+    t3:t3
+    p3:p3
+    t4:t4
+    p4:p4
+    pinchevap:pinchevap
+    dosh:dosh
+    pinchcond:pinchcond
+    dosc:dosc
+
     mwflow:mwflow
     mwflowsldr:mwflowsldr
     npump:npump
@@ -2545,7 +2590,7 @@ ScreenManager:
             OneLineIconListItem:
                 MDLabel:
                     id: qin
-                    text: "Heat Duty : None [Gcal/hr]"
+                    text: "Heat Duty : None [kW]"
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
                     size_hint: 0.9,None
