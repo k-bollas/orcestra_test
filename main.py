@@ -1,5 +1,7 @@
 from kivymd.app import MDApp
 from kivy.clock import mainthread, Clock
+from kivy.animation import Animation
+from kivy.uix.button import Button
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen, RiseInTransition, NoTransition, SlideTransition
 from kivy.lang import Builder
@@ -28,6 +30,7 @@ import os
 from numpy import sqrt, polyval
 from thermo_cycle import Thermodynamic_Cycle
 import thermo_funcs as tf
+import cProfile
 
 os.environ["KIVY_NO_CONFIG"] = "1"
 
@@ -47,6 +50,9 @@ class EvaporatorPropCustomSheet(MDBoxLayout):
     title = StringProperty()
     text = StringProperty()
     image = StringProperty()
+
+class WorkingFluidInfoSheet(MDBoxLayout):
+    pass
     
 class RotorCustomSheet(MDBoxLayout):
     divider = None
@@ -96,13 +102,16 @@ class Thermotab1(BoxLayout, MDTabsBase):
         self.odpfield.text = "None"
         cf.WFLUID = "Working Fluid : {}".format(args[0])
         cf.WorkingFluid = self.WorkingFluid
+
+    def show_workingfluidinfo_sheet(self):
+        self.custom_sheet = MDCustomBottomSheet(screen=Factory.WorkingFluidInfoSheet())
+        self.custom_sheet.open()
         
     def WorkingFluid_bottom_sheet(self):
         bottom_sheet_menu = MDListBottomSheet()
-        self.WorkingFluidData = ["Isopentane"]
-        self.WorkingFluidCoolProp = ["IPENTANE"]
-        
-        self.WorkingFluidType = ["Dry"]
+        self.WorkingFluidData = ["Cyclohexane", "Ethanol", "Isobutane", "Isopentane", "MDM", "R245fa", "Toluene"]
+        self.WorkingFluidCoolProp = ["CYCLOHEX", "ETHANOL", "ISOBUTAN", "IPENTANE", "MDM", "R245FA", "TOLUENE"]
+        self.WorkingFluidType = ["Dry", "Wet", "Dry","Dry", "Dry", "Dry", "Dry"]
                 
         for i in range(0, len(self.WorkingFluidData)):
             bottom_sheet_menu.add_item(
@@ -256,6 +265,8 @@ class Thermotab3(BoxLayout, MDTabsBase):
     thermotab1 = ObjectProperty(None)
     thermotab2 = ObjectProperty(None)
     thermspinner = ObjectProperty(None)
+    dosh_change = False
+
 
     @mainthread
     def spinner_toggle(self):
@@ -270,35 +281,46 @@ class Thermotab3(BoxLayout, MDTabsBase):
         self.snackbar.open()
     
     def ThermCalculations(self):
-        if self.thermotab1.WorkingFluid == None or self.thermotab2.HeatSource == None:
-            if self.thermotab1.WorkingFluid == None and self.thermotab2.HeatSource != None: textmsg = "Please select Working Fluid"
-            elif self.thermotab1.WorkingFluid != None and self.thermotab2.HeatSource == None: textmsg = "Please select Heat Source"
-            else: textmsg = "Please select Working Fluid and type of Heat Source"
-            self.dialog = MDDialog(
-            title="[color={}][b] Not Enough Inputs [/b][/color]".format("#4863A0"),
-            text=textmsg,
-            buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
-            self.dialog.open()
-            self.spinner_toggle()         
-            return
+        try:
+            if self.thermotab1.WorkingFluid == None or self.thermotab2.HeatSource == None:
+                if self.thermotab1.WorkingFluid == None and self.thermotab2.HeatSource != None: textmsg = "Please select Working Fluid"
+                elif self.thermotab1.WorkingFluid != None and self.thermotab2.HeatSource == None: textmsg = "Please select Heat Source"
+                else: textmsg = "Please select Working Fluid and type of Heat Source"
+                self.dialog = MDDialog(
+                title="[color={}][b] Not Enough Inputs [/b][/color]".format("#4863A0"),
+                text=textmsg,
+                buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
+                self.dialog.open()
+                self.spinner_toggle()         
+                return
 
-        self.tc = Thermodynamic_Cycle()
-        self.tc.Th1, self.tc.Ph1 = float(self.thermotab2.th1.text) + 273.15, float(self.thermotab2.ph1.text)*1e5
-        self.tc.mh_flow = float(self.thermotab2.mhflow.text)
-        self.tc.fluid = self.thermotab1.WorkingFluid
-        self.tc.Tw1, self.tc.Pw1 = float(self.thermotab2.tw1.text) + 273.15, float(self.thermotab2.pw1.text)*1e5
-        self.tc.mw_flow = float(self.thermotab2.mwflow.text)
-        self.tc.Pinch_evap_init, self.tc.Pinch_cond__init = float(self.thermotab2.pinchevap.text), float(self.thermotab2.pinchcond.text)
-        self.tc.DoSC, self.tc.DoSH = float(self.thermotab2.dosc.text), float(self.thermotab2.dosh.text)
-        self.tc.y_exh = [0, 0, 1, 0] if self.thermotab2.HeatSource == "WATER" else [self.thermotab2.nN2, self.thermotab2.nCO2, self.thermotab2.nH2O, self.thermotab2.nO2]
-        self.tc.m_flow = float(self.thermotab1.mflow.text)
+            self.tc = Thermodynamic_Cycle()
+            self.tc.Th1, self.tc.Ph1 = float(self.thermotab2.th1.text) + 273.15, float(self.thermotab2.ph1.text)*1e5
+            self.tc.mh_flow = float(self.thermotab2.mhflow.text)
+            self.tc.fluid = self.thermotab1.WorkingFluid
+            self.tc.Tw1, self.tc.Pw1 = float(self.thermotab2.tw1.text) + 273.15, float(self.thermotab2.pw1.text)*1e5
+            self.tc.mw_flow = float(self.thermotab2.mwflow.text)
+            self.tc.Pinch_evap_init, self.tc.Pinch_cond__init = float(self.thermotab2.pinchevap.text), float(self.thermotab2.pinchcond.text)
+            self.tc.DoSC_init, self.tc.DoSH_init = float(self.thermotab2.dosc.text), float(self.thermotab2.dosh.text)
+            self.tc.y_exh = [0, 0, 1, 0] if self.thermotab2.HeatSource == "WATER" else [self.thermotab2.nN2, self.thermotab2.nCO2, self.thermotab2.nH2O, self.thermotab2.nO2]
+            self.tc.m_flow = float(self.thermotab1.mflow.text)
 
-        self.m_flow_max = self.tc.maximum_mass_flow()
-        if self.tc.m_flow <= self.m_flow_max:
+            self.m_flow_max = self.tc.maximum_mass_flow()
             if self.thermotab1.massflowopt.active == True:
                 self.tc.mass_flow_optimisation()
             else:
-                self.tc.Cycle_Dry_States(self.tc.m_flow)
+                if self.tc.m_flow <= self.m_flow_max:
+                    if self.thermotab1.WorkingFluidType[self.thermotab1.WorkingFluidCoolProp.index(self.tc.fluid)] == "Dry":
+                        self.tc.Cycle_Dry_States(self.tc.m_flow)
+                    elif self.thermotab1.WorkingFluidType[self.thermotab1.WorkingFluidCoolProp.index(self.tc.fluid)] == "Wet":
+                        self.tc.Cycle_Wet_States(self.tc.m_flow)
+                else:
+                    self.dialog = MDDialog(
+                    title="[color={}][b] Calculation Error [/b][/color]".format("#4863A0"),
+                    text="Too high mass flow. For the given inlet conditions mass flow can not be higher than {:.3f} kg/s".format(self.m_flow_max),
+                    buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
+                    self.dialog.open()
+            if self.tc.DoSH != self.tc.DoSH_init: self.dosh_change = True
             self.thermotab2.th2.text, self.thermotab2.ph2.text = "{:.2f}".format(self.tc.Th2-273.15), "{:.3f}".format(self.tc.Ph2/1e5)
             self.thermotab2.tw2.text, self.thermotab2.pw2.text = "{:.2f}".format(self.tc.Tw2-273.15), "{:.3f}".format(self.tc.Pw2/1e5)
             self.thermotab2.dosh.text, self.thermotab2.pinchevap.text = "{:.2f}".format(self.tc.DoSH), "{:.2f}".format(self.tc.Pinch_evap) 
@@ -319,199 +341,49 @@ class Thermotab3(BoxLayout, MDTabsBase):
             self.thermotab1.mflowsldr.value = float(self.tc.m_flow)
             self.ThermCalcCompleted = 'Completed'
 
-        else:
-            self.dialog = MDDialog(
-            title="[color={}][b] Calculation Error [/b][/color]".format("#4863A0"),
-            text="Too high mass flow. For the given inlet conditions mass flow can not be higher than {:.3f} kg/s".format(self.m_flow_max),
-            buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
-            self.dialog.open()  
-
+        except Exception as exc:
+            self.unexpected_error(exc)
 
         self.ThermFinish()
         self.spinner_toggle()
 
-    def close_dialog(self,obj):
-        self.dialog.dismiss()
-            
+    def unexpected_error(self, exc):
+        self.dialog = MDDialog(
+        title="[color={}][b] Calculation Error [/b][/color]".format("#4863A0"),
+        text="Oops. An unexpeted error seems to have been appeared. We are working on that. Please select some other inputs for the calculations. Error : {}".format(exc),
+        buttons=[MDFlatButton(text="GO BACK", text_color=(0.28, 0.39, 0.63, 1), on_release=self.close_dialog),],size_hint=(0.75,1))
+        self.dialog.open()
+
     def ThermCalculations_thread(self):
-        self.spinner_toggle()
-        self.therm_thread = threading.Thread(target=(self.ThermCalculations))
-        self.therm_thread.start()
+        if self.dosh_change == True:
+            self.dialog_warning = MDDialog(
+            title="[color={}][b] Warning [/b][/color]".format("#4863A0"),
+            text="Degrees of Superheating have changed during previous calculation. Do you want to keep to new value or to reset to the initial value?",
+            buttons=[MDFlatButton(text="RESET", text_color=(0.28, 0.39, 0.63, 1), on_release=self.reset_button),
+            MDFlatButton(text="KEEP", text_color=(0.28, 0.39, 0.63, 1), on_release=self.keep_button)],size_hint=(0.9,1))
+            self.dialog_warning.open()
+            self.dosh_change = False
+        else:
+            self.spinner_toggle()
+            self.therm_thread = threading.Thread(target=(self.ThermCalculations))
+            self.therm_thread.start()
               
+            
+    def reset_button(self,obj) -> None:
+        self.thermotab2.dosh.text = "{:.2f}".format(self.tc.DoSH_init)
+        self.thermotab2.doshsldr.value = float(self.tc.DoSH_init)
+        self.close_dialog_warning(None)
+        self.ThermCalculations_thread()
 
-
-class VelTriatab1(BoxLayout, MDTabsBase):
-    workingfluidvel = ObjectProperty(None)
-    tet = ObjectProperty(None)
-    pet = ObjectProperty(None)
-    mflowvel = ObjectProperty(None)
-    prorm2text = ObjectProperty("Pressure Ratio [-]:")
-    prorm2 = ObjectProperty(None)
-    mx2 = ObjectProperty(None)
-    rn = ObjectProperty(None)
-    rotationalspeed = ObjectProperty(None)
-    maxrotspeed = ObjectProperty(None)
-    material = ObjectProperty(None)
-    sf = ObjectProperty(None)
-    htr = ObjectProperty(None)
-    zs = ObjectProperty(None)
-    smin = ObjectProperty(None)
-    custom_sheet = ObjectProperty(None)
-    rotspeedlabel = ObjectProperty(None)
-    rotspeedicon = ObjectProperty(None)
-    mx2sldr = ObjectProperty(None)
-    rnsldr = ObjectProperty(None)
-    rotspeedminus = ObjectProperty(None)
-    rotspeedplus = ObjectProperty(None)
-    rotspeedsldr = ObjectProperty(None)
-    rotspeedrestore = ObjectProperty(None)
-    rotspeedround = ObjectProperty(None)
-    sfsldr = ObjectProperty(None)
-    htrsldr = ObjectProperty(None)
-    zssldr = ObjectProperty(None)
-    sminsldr = ObjectProperty(None)
-    
-    def callback_for_pressureratio(self, *args):
-        self.prorm2text.text = args[0]
-        if args[0] == "Mach Number M2 [-]":
-            self.prorm2.text = "2.00"
-        else:
-            self.prorm2.text = cf.PR
-        
-    
-    def PressureRatio_bottom_sheet(self, **kwargs):
-        bottom_sheet_menu = MDListBottomSheet()
-        self.PressureorMachData = ["Pressure Ratio [-]:", "Mach Number M2 [-]:"]
-        for i in range(0, len(self.PressureorMachData)):
-            bottom_sheet_menu.add_item(
-                self.PressureorMachData[i],
-                lambda x, y=i: self.callback_for_pressureratio(self.PressureorMachData[y]))
-        bottom_sheet_menu.open()
-        
-    def callback_for_material(self, *args):
-        self.material.text = "Material : {}".format(args[0])
-        self.materialchoice = args[0]
-        cf.MaterialSelected = True
-        
-    def Material_bottom_sheet(self, **kwargs):
-        bottom_sheet_menu = MDListBottomSheet()
-        self.MaterialData = ["St 37-2", "St 44-2", "St 50-2", "St 52-3", "St 60-2", "St 70-2", "StE 355", "StE 420", "StE 460", "C10E", "17Cr3", "16MnCr5", "20MnCr5", "20MoCrS4", "18CrNiMo7-6", "1C22", "2C22", "1C25", "1C30", "1C35", "1C40", "1C45", "2C45", "1C50", "1C60", "46Cr2", "41Cr4", "34CrMo4", "42CrMo4", "50CrMo4", "36CrNiMo4", "30CrNiMo8", "34CrNiMo6", "31CrMo12", "31CrMoV9", "15CrMoV59", "34CrAlMo5", "34CrAlNi7"]
-        for i in range(0, len(self.MaterialData)):
-            bottom_sheet_menu.add_item(
-                self.MaterialData[i],
-                lambda x, y=i: self.callback_for_material(self.MaterialData[y]))
-        bottom_sheet_menu.open()
-        
-    def show_custom_bottom_sheet(self, choice):
-        def get_title(i):
-            switcher={
-                "prorm2":"Pressure Ratio or Mach Number",
-                "mx2":"Axial Mach Number",
-                "rn":"Degree of Reaction",
-                "rotationalspeed":"Rotational Speed",
-                "sf":"Material and Safety Factor",
-                "htr":"Hub to Tip ratio",
-                "zs":"Number of blades",
-                "smin":"Minimun blade thickness"}
-            return str(switcher.get(i))
-        
-        def get_text(i):
-            switcher={
-                "prorm2":"Select pressure ratio or stator's exit Mach number as input and set value",
-                "mx2":"Set the axial Mach number, which is constant through the stator and rotor",
-                "rn":"Set the turbine's degree of reaction in prercentage. Degrees of reaction of 0% (impulse turbine) are prefered in these applications",
-                "rotationalspeed":"Define the rotational speed in the rotor blade in rpm or select the maximum possible rotational speed, based of the centrifugal stresses limits",
-                "sf":"Define the material of the rotor blade and set the safety factor of the construction. The safety factor sets the maximun rotational speed of the rotor blade according to the centrifugal stresses",
-                "htr":"Define the stator blade's hub to tip ratio",
-                "zs":"Define the number of blades of the stator",
-                "smin":"Set the minimum possible value for the blade thickness in mm. The minimum blade thickness is also equal the the diameter in the trailing edge"}
-            return str(switcher.get(i))
-        
-        self.custom_sheet = MDCustomBottomSheet(screen=Factory.ContentCustomSheet(title = get_title(choice), text = get_text(choice)))
-        self.custom_sheet.open()
-        
-    def MaxRotActivate(self):
-        if self.maxrotspeed.active == True:
-            self.rotationalspeed.disabled = True
-            self.rotspeedminus.disabled = True
-            self.rotspeedplus.disabled = True
-            self.rotspeedsldr.disabled = True
-            self.rotspeedround.disabled = True
-            self.rotspeedrestore.disabled = True
-            self.rotspeedlabel.text_color = [128/255,128/255,128/255, 1]
-            self.rotspeedicon.text_color = [128/255,128/255,128/255, 1]
-        else:
-            self.rotationalspeed.disabled = False
-            self.rotspeedminus.disabled = False
-            self.rotspeedplus.disabled = False
-            self.rotspeedsldr.disabled = False
-            self.rotspeedround.disabled = False
-            self.rotspeedrestore.disabled = False
-            self.rotspeedlabel.text_color = [0.19, 0.64, 0.20, 1]
-            self.rotspeedicon.text_color = [0.19, 0.64, 0.20, 1]
-
-
-class VelTriatab2(BoxLayout, MDTabsBase):
-    dh0 = ObjectProperty(None)
-    ublade = ObjectProperty(None)
-    mblade = ObjectProperty(None)
-    nrotational = ObjectProperty(None)
-    prvel = ObjectProperty(None)
-    psi = ObjectProperty(None)
-    phi = ObjectProperty(None)
-    woutact = ObjectProperty(None)
-    wnetact = ObjectProperty(None)
-    nexerg = ObjectProperty(None)
-    veltriaspinner = ObjectProperty(None)
+    def keep_button(self,obj) -> None:
+        self.close_dialog_warning(None)
+        self.ThermCalculations_thread()
 
     def close_dialog(self,obj):
         self.dialog.dismiss()
 
-    def VelStator_dialog(self):
-        if self.ublade.text == "Blade Velocity U : None [m/s]":
-            M1 = "None"; V1 = "None"; M2 = "None"; V2 = "None"; a1 = "None"; a2 = "None"
-        else:
-            M1 = "{:.3f}".format(self.M1); V1 = "{:.3f}".format(self.V1); M2 = "{:.3f}".format(self.M2); V2 = "{:.3f}".format(self.V2); 
-            a1 = "{:.3f}".format(0); a2 = "{:.3f}".format(self.a2)
-        self.dialog = MDDialog(
-            title="[color={}][b] {} [/b][/color]".format("#30A234","Stator Results"),
-            type="simple",
-            items=[
-                ItemVelState(var="Mach Inlet M1 :",value=M1, units=""),
-                ItemVelState(var="Velocity Inlet V1 :",value=V1, units=" [m/s]"),
-                ItemVelState(var="Mach Outlet M2 :",value=M2, units=""),
-                ItemVelState(var="Velocity Outlet V2 :",value=V2, units=" [m/s]"),
-                ItemVelState(var="Inlet Flow angle U+03b1 1 :",value=a1, units=" [deg]"),
-                ItemVelState(var="Outlet Flow angle U+03b1 2 :",value=a2, units=" [deg] "),
-            ],
-            buttons=[MDFlatButton(text="GO BACK", text_color=(0.19, 0.64, 0.20, 1), on_release=self.close_dialog)],
-            size_hint=(0.85,1))
-        self.dialog.open()
-        
-    def VelRotor_dialog(self):
-        if self.ublade.text == "Blade Velocity U : None [m/s]":
-            Mrel2 = "None"; W2 = "None"; Mrel3 = "None"; W3 = "None"; M3 = "None"; V3 = "None"; b2 = "None"; b3 = "None"; a3 = "None"
-        else:
-            Mrel2 = "{:.3f}".format(self.Mrel2); W2 = "{:.3f}".format(self.W2); Mrel3 = "{:.3f}".format(self.Mrel3); W3 = "{:.3f}".format(self.W3)
-            M3 = "{:.3f}".format(self.M3); V3 = "{:.3f}".format(self.V3); b2 = "{:.3f}".format(self.b2); b3 = "{:.3f}".format(self.b3)
-            a3 = "{:.3f}".format(self.a3)
-        self.dialog = MDDialog(
-            title="[color={}][b] {} [/b][/color]".format("#30A234","Rotor Results"),
-            type="simple",
-            items=[
-                ItemVelState(var="Relative Mach Inlet Mrel,2 :",value=Mrel2, units=""),
-                ItemVelState(var="Relative Velocity Inlet W2 :",value=W2, units=" [m/s]"),
-                ItemVelState(var="Relative Mach Outlet Mrel,3 :",value=Mrel3, units=""),
-                ItemVelState(var="Relative Velocity Outlet W3 :",value=W3, units=" [m/s]"),
-                ItemVelState(var="Absolute Mach Outlet M3 :",value=M3, units=""),
-                ItemVelState(var="Absolute Velocity Outlet V3 :",value=V3, units=" [m/s]"),
-                ItemVelState(var="Relative Flow Inlet angle b2 :",value=b2, units=" [deg]"),
-                ItemVelState(var="Relative Flow Outlet angle b3 :",value=b3, units=" [deg] "),
-                ItemVelState(var="Absolute Flow Outlet angle a3 :",value=a3, units=" [deg] "),
-            ],
-            buttons=[MDFlatButton(text="GO BACK", text_color=(0.19, 0.64, 0.20, 1), on_release=self.close_dialog)],
-            size_hint=(0.85,1))
-        self.dialog.open()
+    def close_dialog_warning(self,obj):
+        self.dialog_warning.dismiss()
         
                 
 class MainScreen(Screen):
@@ -683,7 +555,7 @@ class ThermoStateScreen(Screen):
             Pvalue = "{:.3f}".format(Pstates[self.manager.screens[2].ids.thermotab2.statepressed - 1]/1e5)
             Zvalue = "{}".format(Zstates[self.manager.screens[2].ids.thermotab2.statepressed - 1])
 
-            rhovalue = tf.density_liquid('mass', fluid) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else tf.density(float(Pvalue)*1e5, float(Tvalue) + 273.15, fluid)
+            rhovalue = tf.density_liquid('mass', fluid, float(Tvalue)+273.15) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else tf.density(float(Pvalue)*1e5, float(Tvalue) + 273.15, fluid)
             vvalue = 1/rhovalue
             rhovalue, vvalue = "{:.3f}".format(rhovalue), "{:.3f}".format(vvalue)
             hvalue = tf.enthalpy_liquid('mass', float(Pvalue)*1e5, float(Tvalue) + 273.15, 101325, 298.15, fluid) if self.manager.screens[2].ids.thermotab2.statepressed <= 2 else tf.enthalpy('mass', float(Pvalue)*1e5, float(Tvalue) + 273.15, 101325, 298.15, fluid)
@@ -709,154 +581,32 @@ class ThermoStateScreen(Screen):
         self.cp.text = "Specific Heat Capacity Cp : {} [kJ/kg-K]".format(Cpvalue)
         self.cv.text = "Specific Heat Capacity Cv : {} [kJ/kg-K]".format(Cvvalue)
 
-class VelTriaScreen(Screen):    
-    pass        
-class StatorScreen(Screen):
-    check = ObjectProperty(None)
-    rhubs = ObjectProperty(None)
-    rtips = ObjectProperty(None)
-    hs = ObjectProperty(None)
-    ythroat = ObjectProperty(None)
-    pitch = ObjectProperty(None)
-    dte = ObjectProperty(None)
-    gridexs = NumericProperty(-1)
-    charlinesexs = NumericProperty(-1)
-    gridtext = ObjectProperty(None)
-    linestext = ObjectProperty(None)
-    mab = ObjectProperty(None)
-    gammasldr = ObjectProperty(None)
-    m2sldr = ObjectProperty(None)
-    r2r1sldr = ObjectProperty(None)
-    mabsldr = ObjectProperty(None)
-    statorspinner = ObjectProperty(None)
-    schord = ObjectProperty(None)
-    ssolidity = ObjectProperty(None)
-    schratio = ObjectProperty(None)
-    
-    def on_pre_enter(self):
-        self.rtips.text = "{:.3f}".format(cf.Rtips*1e3) if cf.M2 != None else cf.Rtips
-        self.rhubs.text = "{:.3f}".format(cf.Rhubs*1e3) if cf.M2 != None else cf.Rhubs
-        self.hs.text  = "{:.3f}".format(cf.Hs*1e3) if cf.M2 != None else cf.Hs
-        self.ythroat.text = "{:.3f}".format(cf.ythroat) if cf.ythroat != None else "1"
-        self.dte.text = "{:.3f}".format(cf.dte*1e3) if cf.M2 != None else "None"
-        self.pitch.text = "{:.3f}".format(cf.pitch*1e3) if cf.M2 != None else cf.pitch
-        
-    def show_statorblade_bottom_sheet(self):
-        self.custom_sheet = MDCustomBottomSheet(screen=Factory.StatorBladeCustomSheet())
-        self.custom_sheet.open()
-        
-    def show_statorsectionab_bottom_sheet(self):
-        self.custom_sheet = MDCustomBottomSheet(screen=Factory.StatorSectionAbCustomSheet())
-        self.custom_sheet.open()
-        
-    def show_statorR2R1_bottom_sheet(self):
-        self.custom_sheet = MDCustomBottomSheet(screen=Factory.StatorR2R1CustomSheet())
-        self.custom_sheet.open()
-                
-            
-    def close_dialog(self,obj):
-        self.dialog.dismiss()        
-                   
-class RotorScreen(Screen):
-    labelmrel2 = ObjectProperty(None)
-    labelmrel3 = ObjectProperty(None)
-    labelb2 = ObjectProperty(None)
-    labelb3 = ObjectProperty(None)
-    labelgamma = ObjectProperty(None)
-    mrel2sldr = ObjectProperty(None)
-    mrel3sldr = ObjectProperty(None)
-    b2sldr = ObjectProperty(None)
-    b3sldr = ObjectProperty(None)
-    gammasldr = ObjectProperty(None)
-    rhubr = ObjectProperty(None)
-    rtipr = ObjectProperty(None)
-    hr = ObjectProperty(None)
-    dte = ObjectProperty(None)
-    msssldr = ObjectProperty(None)
-    mss = ObjectProperty(None)
-    mpssldr = ObjectProperty(None)
-    mps = ObjectProperty(None)
-    rchord = ObjectProperty(None)
-    rpitch = ObjectProperty(None)
-    rsolidity = ObjectProperty(None)
-    rchratio = ObjectProperty(None)
-    rsonic = ObjectProperty(None)
-    mrel2ini = NumericProperty(1.40)
-    mrel3ini = NumericProperty(1.50)
-    b2ini = NumericProperty(60.0)
-    b3ini = NumericProperty(60.0)
-    gammaini = NumericProperty(1.40)
-    mssini = NumericProperty(1.80)
-    mpsini = NumericProperty(1.20)
-    gridexs = NumericProperty(-1)
-    envelopexs = NumericProperty(-1)
-    arcexs = NumericProperty(-1)
-    gridtext = ObjectProperty(None)
-    envelopetext = ObjectProperty(None)
-    arcstext = ObjectProperty(None)
-    
-    def on_pre_enter(self, *args):
-        self.errorcalc = False
-        
-        self.Mrel2 = cf.Mrel2 if cf.Mrel2 != None else 1.4
-        self.Mrel3 = cf.Mrel3 if cf.Mrel3 != None else 1.5
-        self.b2 = float(cf.b2) if cf.b2 != None else float(60)
-        self.b3 = float(cf.b3) if cf.b3 != None else float(60)
-        self.Gamma = float(cf.Gamma) if cf.Gamma != None else 1.4
-        self.mrel2ini = float(self.Mrel2); self.mrel3ini = float(self.Mrel3); self.b2ini = self.b2; self.b3ini = self.b3; self.gammaini = self.Gamma;
-        self.mssini = self.mrel2ini + 0.4
-        self.mpsini = self.mrel2ini - 0.2 if self.mrel2ini - 0.2 > 1 else 1.01
-                
-    def show_rotor_custom_bottom_sheet(self, choice):
-        def get_title(i):
-            switcher={
-                "mrel2":"Inlet Relative Mach number",
-                "mrel3":"Outlet Relative Mach number",
-                "b2":"Inlet Relative Flow angle",
-                "b3":"Inlet Relative Flow angle",
-                "gamma":" Polytropic Index k",
-                "mss":"Mach number in sunction side",
-                "mps":"Mach number in pressure side"}
-            return str(switcher.get(i))
-        
-        def get_text(i):
-            switcher={
-                "mrel2":"Select the Mach number in the rotor's inlet. This Mach number is a relative Mach number as it is derived from the relative velocity W2.  Mrel2 = W2/c2",
-                "mrel3":"Select the Mach number in the rotor's inlet. This Mach number is a relative Mach number as it is derived from the relative velocity W3.  Mrel3 = W3/c3",
-                "b2":"Select the flow angle in the rotor's inlet. This flow angle is the relative flow angle, as it is derived from the relative velocity W2.",
-                "b3":"Select the flow angle in the rotor's outlet. This flow angle is the relative flow angle, as it is derived from the relative velocity W3.",
-                "gamma": "Set the polytropic index of the proposed process, or calculate it through the thermodynamic cycle and the velocity triangles analysis. The polytropic index defines finally the shape of the blade",
-                "mss":"Specify the Mach number in the sunction side, which is the maximum Mach number in the blade passage. Note that the Mach number in sunction side must be greater than the Mach number in inlet and the outlet",
-                "mps":"Specify the Mach number in the pressure side, which is the minimum Mach number in the blade passage. Note that the Mach number in pressure side must be lower than the Mach number in inlet and the outlet"}
-            return str(switcher.get(i))
-        
-        self.custom_sheet = MDCustomBottomSheet(screen=Factory.RotorCustomSheet(title = get_title(choice), text = get_text(choice)))
-        self.custom_sheet.open()
-                
-    def close_dialog(self,obj):
-        self.dialog.dismiss()
-        
-    def sunc_pres_limits(self,choice,**kwargs):
-        if choice == "mps":
-            if self.mpssldr.value > min(self.mrel2sldr.value,self.mrel3sldr.value) - 1e-3:
-                self.mpssldr.value = min(self.mrel2sldr.value,self.mrel3sldr.value) - 1e-3
-                self.mps.text = "{:.2f}".format(self.mpssldr.value)
-        elif choice == "mss":
-            if self.msssldr.value < max(self.mrel2sldr.value,self.mrel3sldr.value):
-                self.msssldr.value = max(self.mrel2sldr.value,self.mrel3sldr.value)
-                self.mss.text = "{:.2f}".format(self.msssldr.value)
-                
+
+class WorkingFluidInfoScreen(Screen):
+    pass
+
+class HeatSourceInfoScreen(Screen):
+    pass               
         
 class MyMainApp(MDApp):
     dialog = None
     WFLUID = "Select"
     Clock.max_iteration = 20
+    counter = 0
 
     class ContentNavigationDrawer(BoxLayout):
         pass
 
     class DrawerList(ThemableBehavior, MDList):
         pass        
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.title = "ORCestra"
+
+        Window.keyboard_anim_args = {"d": 0.2, "t": "linear"}
+        Window.softinput_mode = "below_target"
     
     def build(self, *args):
         self.theme_cls.primary_palette = 'Indigo'
@@ -880,6 +630,11 @@ class MyMainApp(MDApp):
         self.screen_helper.transition = NoTransition()
         self.screen_helper.current = 'main'
         self.screen_helper.transition = SlideTransition()
+        self.profile = cProfile.Profile()
+        self.profile.enable()
 
+    def on_stop(self):
+        self.profile.disable()
+        self.profile.dump_stats('myapp.profile')
 
 MyMainApp().run()

@@ -10,6 +10,9 @@ def power_law(x, a, b, c):
 def third_poly(x, a, b, c, d) -> float:
     return a*x**3 + b*x**2 + c*x + d
 
+def fourth_poly(x, a, b, c, d, e) -> float:
+    return a*x**4 + b*x**3 + c*x**2 + d*x + e
+
 def poly_log(x, a, b, c, d) -> float:
     return a*x**2 + b*x + c*log(x) + d
 
@@ -29,7 +32,7 @@ def poly_frac_integral(x1,x2, *args) -> float:
         n = n - 1
     return I
 
-def secant(a,b,f,tol):
+def secant(a,b,f,tol, *args):
     a_n = a; f_a_n = f(a)
     b_n = b; f_b_n = f(b)
     stepNum=0
@@ -37,13 +40,17 @@ def secant(a,b,f,tol):
     m_n = a_n - f_a_n*(b_n - a_n)/(f_b_n - f_a_n)
     f_m_n = f(m_n)
     while abs(b_n-a_n) > tol:
+        f_prev = f_m_n
         stepNum=stepNum+1
         m_n = a_n - f_a_n*(b_n - a_n)/(f_b_n - f_a_n)
         f_m_n = f(m_n)
         # print(m_n, f_m_n, 50*' ')#, end='\r', flush=True)
-        # print(a_n, b_n, m_n, f_m_n)
+        if 'show' in args:
+            print(a_n, b_n, m_n)
         if abs(f_m_n) < 1e-8:
             # print("Found exact solution." , end = '\r', flush=True)
+            break
+        if abs(f_m_n) < 1e-6 and abs(f_prev - f_m_n) < 1e-8:
             break
         if f_a_n*f_m_n < 0:
             a_n = a_n; f_a_n = f_a_n
@@ -54,6 +61,8 @@ def secant(a,b,f,tol):
         else:
             print("Secant method fails.")
             return None
+        if stepNum > 500:
+            raise ValueError("Secant method did not converge.")
     return m_n, f_m_n, stepNum
 
 def alternative_secant(x1,x2,f,tol, *args):
@@ -65,6 +74,10 @@ def alternative_secant(x1,x2,f,tol, *args):
         B = array([[1], [0]])
         p = matmul(inv(A), B)
         x_n = float(sum([k1*k2 for k1,k2 in zip(p, [x1,x2])]))
+        if 'show' in args:
+            print(x_n, x1, x2)
+        if x_n < 0 and 'only_possitive' in args:
+            x_n = float(rand(1)*(x1 + x2)/2)
         err = abs(x2 - x_n)
         x1,x2 = x2, x_n
         # print(x1, x2)
@@ -86,7 +99,8 @@ def general_secant(x1,x2,x3,F,tol, *args):
             if x_n[0] < 0: x_n[0] = rand(1)*(x1[0] + x3[0])/2
             if x_n[1] < 0: x_n[1] = rand(1)*(x1[1] + x3[1])/2
         x1, x2, x3 = x2, x3, x_n
-        # print(x1, x2, x3)
+        if 'show' in args:
+            print(x1, x2, x3)
     return x_n, F(x_n), stepNum
 
 def goldenOpt(a,b,f,tol):
@@ -121,6 +135,12 @@ def critical_pres(media) -> float:
     Data = {
         "IPENTANE": 3378000.0,
         "H2O": 22064000.0,
+        "MDM": 1410044.755816551,
+        "ISOBUTAN": 3629000.0,
+        "CYCLOHEX": 4082400.0,
+        "TOLUENE": 4126000.0,
+        "R245FA": 3651000.0,
+        "ETHANOL": 6268000.0,
     }
     return Data[media]
 
@@ -128,6 +148,12 @@ def critical_temp(media) -> float:
     Data = {
         "IPENTANE": 460.35,
         "H2O": 647.096,
+        "MDM": 564.09,
+        "ISOBUTAN": 407.817,
+        "CYCLOHEX": 553.6,
+        "TOLUENE": 591.75,
+        "R245FA": 427.01,
+        "ETHANOL": 514.71,
     }
     return Data[media]
 
@@ -141,26 +167,61 @@ def molar_mass(media) -> float:
         "H2":2.01588,
         "CH4": 16.0428,
         "IPENTANE": 72.14878,
+        "MDM": 236.53146,
+        "ISOBUTAN": 58.1222,
+        "CYCLOHEX": 84.15948,
+        "TOLUENE": 92.13842,
+        "R245FA": 134.04794,
+        "ETHANOL": 46.06844,
     }
     return Data[media]
 
 def reference_data(media, *args) -> float:
     # T_ref = 298.15, P_ref = 101325
     h_ref_Data = {
-        "IPENTANE": -465.1999941068353
+        "IPENTANE": -465.1999941068353,
+        "MDM": -58570.09383622628,
+        "ISOBUTAN": 34758.775616486266,
+        "CYCLOHEX": -9340.27904250502,
+        "TOLUENE": -14572.886642192747,
+        "R245FA": 57040.279662335124,
+        "ETHANOL": -6572.404291526346,
     }
 
     s_ref_Data = {
-        "IPENTANE": -1.5529314296953771
+        "IPENTANE": -21.52401509346904,
+        "MDM": -687.9834445109129,
+        "ISOBUTAN": 1206.3691080638048,
+        "CYCLOHEX": -340.60680672773975,
+        "TOLUENE": -464.74963440253316,
+        "R245FA": 1115.5846904191837,
+        "ETHANOL": -439.0314945587033,
     }
 
     P_min_Data = {
-        "IPENTANE": 34548.97173350334
+        "IPENTANE": 34548.97173350334,
+        "MDM": 86.90387897550696,
+        "ISOBUTAN": 162612.3001893673,
+        "CYCLOHEX": 5431.367557558421,
+        "TOLUENE": 1395.625885814431,
+        "R245FA": 72598.85094149844,
+        "ETHANOL": 2585.8919501261157,
     }
 
+    P_sat298_Data = {
+        "IPENTANE": 95589.83365239418,
+        "MDM": 213.47254301663887,
+        "ISOBUTAN": 352388.1004062365,
+        "CYCLOHEX": 11832.999286471502,
+        "TOLUENE": 2829.1165265611617,
+        "R245FA": 150817.34224564815,
+        "ETHANOL":5788.505598418044,
+    }
+
+    s_ref = entropy_vap('molar', P_sat298_Data[media], media)
     return_values = []
     indexs = ['H', 'S', 'Pmin']
-    outputs = [h_ref_Data[media], s_ref_Data[media], P_min_Data[media]]
+    outputs = [h_ref_Data[media], s_ref, P_min_Data[media]]
     for x in args:
         if x in indexs:
             return_values.append(outputs[indexs.index(x)])
@@ -174,8 +235,13 @@ def T_satur(P0, media) -> float:
     if media == "WATER": media = "H2O"
     Data = {
         "IPENTANE": [8.586124683012057, 0.23344582416555298, 173.28132421262504],
-        "H2O": [12.623762604570574, 0.2063015816255692, 233.52523352954742]
-
+        "H2O": [12.623762604570574, 0.2063015816255692, 233.52523352954742],
+        "MDM": [12.096590742622269, 0.22854734568512008, 256.93759829373136],
+        "ISOBUTAN": [5.7993049850386615, 0.24895770773331616, 158.72211480381426],
+        "CYCLOHEX": [7.5807012375559895, 0.2486377080002356, 220.08895766397495],
+        "TOLUENE": [9.730644960745698, 0.2366307544207094, 234.33711669869894],
+        "R245FA": [7.360704186894217, 0.2323716048694507, 180.59410832712788],
+        "ETHANOL": [9.70968895028273, 0.21446413819353646, 235.89978005774904],
     }
     if media in Data.keys():
         popt = Data[media]
@@ -206,12 +272,19 @@ def density(P,T,media) -> float:
     v_real = Z*v_ideal
     return 1/v_real
 
-def density_liquid(base, media):
+def density_liquid(base, media, T):
     rho_liquid_Data = {
-        "IPENTANE": 8070.47,
+        "IPENTANE": [0, 0, 0, 0, 8070.47],
+        "H2O": [0, 0, 0, 0, 53324.19],
+        "MDM": [-1.2880595312062534e-07, 0.00019604226419838502, -0.11147135551056647, 26.94881311365969, -1485.019625114594],
+        "ISOBUTAN": [-2.2038499472799376e-06, 0.002863923973998742, -1.3939804709350871, 299.8187521916941, -23405.90379196215],
+        "CYCLOHEX": [-1.6598096763137473e-07, 0.00025370392986304884, -0.14491751016335225, 35.61049131566977, -2370.1043680203534],
+        "TOLUENE": [-9.730167674413557e-08, 0.00015158548432554335, -0.0881642690939973, 21.659206045895896, -1002.5463195662455],
+        "R245FA": [-2.43187265188239e-06, 0.003190596114244078, -1.5696413256881336, 340.1859064598278, -25890.498639009216],
+        "ETHANOL": [-2.8619074656678294e-07, 0.0004125582592845447, -0.22301184704365895, 52.54644289407915, -3722.935286324642],
     }
 
-    rho_mass = rho_liquid_Data[media]
+    rho_mass = fourth_poly(T, *rho_liquid_Data[media])
     rho_molar = rho_mass*molar_mass(media)
     if base == 'mass':
         rho = rho_mass
@@ -228,7 +301,13 @@ def ideal_cpmolar(media) -> array:
         "H2O": [-5.254044744302822e-09, 1.721705772021166e-05, -0.006049034275552882, 35.27045769381774],
         "H2": [-8.431231839239766e-10, 4.366173045776814e-06, -0.002900635063489882, 29.640992741512843],
         "CH4": [-8.769571029555713e-10, -1.506882696242349e-05, 0.07519532409238476, 13.294107482324739],
-        "IPENTANE": [-1.4934667404845468e-07, 8.360089620292359e-05, 0.3106936893968899, 25.982404950331297]
+        "IPENTANE": [-1.4934667404845468e-07, 8.360089620292359e-05, 0.3106936893968899, 25.982404950331297],
+        "MDM": [6.173647655701377e-08, -0.000349049175782291, 0.7863488138725345, 147.0192216996996],
+        "ISOBUTAN": [3.8542407810975426e-08, -0.00019964179268486173, 0.39147905560957064, -1.4612289950976314],
+        "CYCLOHEX": [7.385041023155245e-08, -0.0003687354937708429, 0.676314748873086, -63.715250448043065],
+        "TOLUENE": [6.302766275215257e-08, -0.0002893438958704359, 0.503361306228835, -15.388897588237763],
+        "R245FA": [4.105235662808224e-08, -0.00020292075596997966, 0.35797529646942444, 27.542708974698378],
+        "ETHANOL": [1.6420701061576366e-08, -9.401293140086021e-05, 0.20356003967086306, 16.750113393609226],
     }
     return Data[media]
 
@@ -236,6 +315,12 @@ def ideal_cpmolar_liquid(base, media, T) -> float:
     cp_liquid_Data = {
         "IPENTANE": [1.6713590556391626e-06, -0.0007482589775293744, 0.37876360997836633, 73.3483038454218],
         "H2O": [4.6576157438791806e-07, -0.00033388117471674363, 0.07517927022343525, 70.18242280115233],
+        "MDM": [-2.1484892886470624e-06, 0.0027542558476381256, -0.5321224113372257, 392.5617299130509],
+        "ISOBUTAN": [3.1026453533825644e-06, -0.001472808473318796, 0.42276100785573933, 63.86829202663845],
+        "CYCLOHEX": [3.6134827986626795e-07, -0.00013494308947843288, 0.37843554613266217, 46.03630016583857],
+        "TOLUENE": [-1.1938547384150377e-06, 0.0015421758154580837, -0.3082609541054791, 143.20345076468982],
+        "R245FA": [3.1130516427357972e-06, -0.0016183726223522677, 0.4593719857441201, 100.92570367753852],
+        "ETHANOL": [-2.1921431070111532e-06, 0.003319322085561455, -1.0327262719178865, 183.09559305961426],
     }
 
     cp_liquid = cp_liquid_Data[media]
@@ -249,7 +334,13 @@ def ideal_cpmolar_liquid(base, media, T) -> float:
 
 def acentric_factor(media) -> float:
     Data = {
-        "IPENTANE": 0.2274
+        "IPENTANE": 0.2274,
+        "MDM": 0.5280658490542447,
+        "ISOBUTAN": 0.183,
+        "CYCLOHEX": 0.212,
+        "TOLUENE": 0.263,
+        "R245FA": 0.3776,
+        "ETHANOL": 0.644,
     }
     return Data[media]
 
@@ -276,7 +367,14 @@ def enthalpy(base, P2, T2, P1, T1, media, *args) -> float:
 
 def enthalpy_vap(base, P, media) -> float:
     h_vap_Data = {
-        "IPENTANE": [-9.201611431609613e-10, -0.0007290532117048507, -2062.5596407037456, 48644.5830038151]
+        "IPENTANE": [-9.201611431609613e-10, -0.0007290532117048507, -2062.5596407037456, 48644.5830038151],
+        "MDM": [-4.706832346332244e-09, -0.009717918927239886, -2332.7072534523804, 63566.059786981],
+        "ISOBUTAN": [-9.298155956227794e-10, 0.0010227062017887304, -2725.8902355477353, 53571.847735116055],
+        "CYCLOHEX": [-6.903209114592468e-10, -0.0013377955659875978, -2042.1215781232622, 53303.13789278273],
+        "TOLUENE": [-6.159919826250689e-10, -0.00234680517661459, -1933.3645102847584, 55158.13730494063],
+        "R245FA": [-8.699612081155264e-10, -0.00024039387454405194, -2691.442925236896, 57848.44058610911],
+        "ETHANOL": [-3.420530737556484e-10, -0.0013595383377909243, -2269.4120286694224, 64658.162563254424],
+        "H2O": [-1.9910537531148716e-11, -0.0006564921003691679, -1598.0484117387098, 58331.079044394035],
     }
 
     h_vap_par = h_vap_Data[media]
@@ -322,27 +420,25 @@ def pressure_correction_liquid(P, media) -> float:
 
 
 def enthalpy_liquid(base, P2, T2, P1, T1, media) -> float:
-    cp_liquid_Data = {
-        "IPENTANE": [1.6713590556391626e-06, -0.0007482589775293744, 0.37876360997836633, 73.3483038454218],
-        "H2O": [4.6576157438791806e-07, -0.00033388117471674363, 0.07517927022343525, 70.18242280115233],
-    }
 
     beta_Data = {
         "IPENTANE": 1655.0909054141323*1e-6,
         "H2O": 257.62735420172146*1e-6,
+        "MDM": 1224.3463151083774*1e-6,
+        "ISOBUTAN": 2334.400668538693*1e-6,
+        "CYCLOHEX": 1220.336111363932*1e-6,
+        "TOLUENE": 1080.7348553306667*1e-6,
+        "R245FA": 2041.3841250204491*1e-6,
+        "ETHANOL": 1095.4161042780302*1e-6,
     }
 
-    rho_liquid_Data = {
-        "IPENTANE": 8070.47,
-        "H2O": 53324.19,
-    }
+    rho_avg = (density_liquid('molar', media, T1) + density_liquid('molar', media, T2))/2
 
-    cp_liquid = cp_liquid_Data[media]
-    c_avg = (polyval(cp_liquid, T2) + polyval(cp_liquid, T1))/2
-    v_avg = (1/rho_liquid_Data[media])/molar_mass(media)
+    c_avg = (ideal_cpmolar_liquid('molar', media, T2) + ideal_cpmolar_liquid('molar', media, T1))/2
+    v_avg = 1/rho_avg
     T_avg = (T1 + T2)/2
     beta = beta_Data[media]
-    h_molar = c_avg*(T2 - T1) + v_avg*(1 - beta*T_avg)*(P2 - P1)# - pressure_correction_liquid(P2, media)
+    h_molar = c_avg*(T2 - T1) + v_avg*(1 - beta*T_avg)*(P2 - P1)
     h_mass = h_molar/(molar_mass(media)*1e-3)
     if base in ["mass", "molar"]:
         h = h_molar if base == "molar" else h_mass
@@ -373,19 +469,21 @@ def entropy(base, P2, T2, P1, T1, media, *args) -> float:
     return s
 
 def entropy_liquid(base, P2, T2, P1, T1, media) -> float:
-    cp_liquid_Data = {
-        "IPENTANE": [1.6713590556391626e-06, -0.0007482589775293744, 0.37876360997836633, 73.3483038454218]
-    }
-
     beta_Data = {
-        "IPENTANE": 1655.0909054141323*1e-6
+        "IPENTANE": 1655.0909054141323*1e-6,
+        "H2O": 257.62735420172146*1e-6,
+        "MDM": 1224.3463151083774*1e-6,
+        "ISOBUTAN": 2334.400668538693*1e-6,
+        "CYCLOHEX": 1220.336111363932*1e-6,
+        "TOLUENE": 1080.7348553306667*1e-6,
+        "R245FA": 2041.3841250204491*1e-6,
+        "ETHANOL": 1095.4161042780302*1e-6,
     }
-
-    rho_avg = density_liquid('molar', media)
 
     beta = beta_Data[media]
-    cp_liquid = cp_liquid_Data[media]
-    c_avg = (polyval(cp_liquid, T2) + polyval(cp_liquid, T1))/2
+    rho_avg = (density_liquid('molar', media, T1) + density_liquid('molar', media, T2))/2
+
+    c_avg = (ideal_cpmolar_liquid('molar', media, T2) + ideal_cpmolar_liquid('molar', media, T1))/2
     v_avg = 1/rho_avg
     s_molar_i = c_avg*log(T2/T1) - beta*v_avg*(P2 - P1)
     s_molar = s_molar_i
@@ -410,6 +508,29 @@ def entropy_mix(base, P2, T2, P1, T1, y, subs, *args) -> float:
     else:
         raise ValueError(' First parameter must be the specified base that enthalpy is calculated (must be string). The enthalpy must be calculated either in mass or molar based.')
     return s_mix
+
+def entropy_vap(base, P, media) -> float:
+    s_vap_Data = {
+        "IPENTANE": [-2.3685622976725148e-12, 2.0653386974628845e-06, -15.18228407129838, 257.5409239712785],
+        "MDM": [-1.0306565994784075e-11, -8.933823905025606e-06, -15.010139099322735, 257.88411884769897],
+        "ISOBUTAN": [-2.7954903460025027e-12, 7.386665622224886e-06, -18.53539668442893, 298.51729044124096],
+        "CYCLOHEX": [-1.3912863855779808e-12, -1.7666854732184042e-07, -13.934819501044316, 244.69013396392998],
+        "TOLUENE": [-1.1623021293572008e-12, -1.816993218150737e-06, -13.442229961578644, 240.6327813375055],
+        "R245FA": [-2.309200198209342e-12, 2.5464130864281816e-06, -16.983539772156274, 288.24310190971374],
+        "ETHANOL": [-7.522533626954363e-13, -1.246449719250844e-06, -14.471529400967498, 276.4544465089006],
+    }
+
+    s_vap_par = s_vap_Data[media]
+    s_vap_molar = poly_log(P, *s_vap_par)
+    s_vap_mass = s_vap_molar/(molar_mass(media)*1e-3)
+    if base in ["mass", "molar"]:
+        s_vap = s_vap_molar if base == "molar" else s_vap_mass
+    else:
+        raise ValueError(' First parameter must be the specified base that enthalpy is calculated (must be string). The enthalpy must be calculated either in mass or molar based.')
+    return s_vap
+
+def entropy_gas_specified(base, P, media) -> float:
+    return entropy_liquid(base, P, T_satur(P, media), 101325, 298, media) + entropy_vap(base, P, media)
 
 def speed_of_sound(P, T, media) -> float:
     P_i, T_i = P, T
