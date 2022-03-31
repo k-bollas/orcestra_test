@@ -36,8 +36,8 @@ from functools import partial
 
 os.environ["KIVY_NO_CONFIG"] = "1"
 
-# Window.fullscreen = True
-Window.size = (350, 650)
+Window.fullscreen = True
+# Window.size = (350, 650)
 
 class Content(MDBoxLayout):
     pass
