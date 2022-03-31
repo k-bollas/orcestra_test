@@ -865,9 +865,9 @@ ScreenManager:
     t3:t3
     p3:p3
     t4:t4
+    t4s:t4s
     p4:p4
     pinchevap:pinchevap
-    dosh:dosh
     pinchcond:pinchcond
     dosc:dosc
 
@@ -875,6 +875,8 @@ ScreenManager:
     mwflowsldr:mwflowsldr
     npump:npump
     npumpsldr:npumpsldr
+    nturb:nturb
+    nturbsldr:nturbsldr
 
     orientation: "vertical"
     cols: 1
@@ -1153,45 +1155,7 @@ ScreenManager:
                             on_release:
                                 root.mhflow.text = "{:.2f}".format(round(float(root.mhflow.text),1))
                                 root.mhflowsldr.value = round(float(root.mhflowsldr.value),1)
-                OneLineIconListItem:
-                    height: dp(120)
-                    MDLabel:
-                        text: "Hot fluid Outputs:"
-                        font_style: "Button"
-                        theme_text_color: "Custom"
-                        text_color: (0.28, 0.39, 0.63, 1)
-                        pos_hint: {"x":0.10,"y":0.4}
 
-                    MDLabel:
-                        text: "Outlet Temperature [C]:"
-                        theme_text_color: "Custom"
-                        text_color: (0.28, 0.39, 0.63, 1)
-                        size_hint_x : 0.5
-                        pos_hint: {"x":0.15,"y":0.10}
-
-                    MDLabel:
-                        id: th2
-                        text: "None"
-                        hint_text: "Enter value"
-                        size_hint: 0.25,0.25
-                        pos_hint: {"x":0.65,"y":0.475}
-                        theme_text_color: "Custom"
-                        text_color: (0.28, 0.39, 0.63, 1)
-
-                    MDLabel:
-                        text: "Outlet Pressure [bar]:"
-                        theme_text_color: "Custom"
-                        text_color: (0.28, 0.39, 0.63, 1)
-                        size_hint_x : 0.5
-                        pos_hint: {"x":0.15,"y":-0.25}
-
-                    MDLabel:
-                        id: ph2
-                        text: "None"
-                        size_hint: 0.25,0.25
-                        pos_hint: {"x":0.65,"y":0.125}
-                        theme_text_color: "Custom"
-                        text_color: (0.28, 0.39, 0.63, 1)
             MDCard:
                 orientation: "vertical"
                 padding: dp(8)
@@ -1369,6 +1333,7 @@ ScreenManager:
                         on_release:
                             root.dosh.text = "{:.2f}".format(0)
                             root.doshsldr.value = 0
+                            
 
                     MDSlider:
                         id: doshsldr
@@ -1381,6 +1346,7 @@ ScreenManager:
                         thumb_color_down: (0.28, 0.39, 0.63, 1)
                         on_value:
                             root.dosh.text = "{:.2f}".format(doshsldr.value)
+                            
                         
                     MDIconButton:
                         theme_text_color: "Custom"
@@ -1503,6 +1469,46 @@ ScreenManager:
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
 
+            OneLineIconListItem:
+                height: dp(120)
+                MDLabel:
+                    text: "Hot fluid Outputs:"
+                    font_style: "Button"
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+                    pos_hint: {"x":0.10,"y":0.4}
+
+                MDLabel:
+                    text: "Outlet Temperature [C]:"
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+                    size_hint_x : 0.5
+                    pos_hint: {"x":0.15,"y":0.10}
+
+                MDLabel:
+                    id: th2
+                    text: "None"
+                    hint_text: "Enter value"
+                    size_hint: 0.25,0.25
+                    pos_hint: {"x":0.65,"y":0.475}
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+
+                MDLabel:
+                    text: "Outlet Pressure [bar]:"
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+                    size_hint_x : 0.5
+                    pos_hint: {"x":0.15,"y":-0.25}
+
+                MDLabel:
+                    id: ph2
+                    text: "None"
+                    size_hint: 0.25,0.25
+                    pos_hint: {"x":0.65,"y":0.125}
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+
             MDToolbar:
                 title: "Turbine"
                 md_bg_color: (0.60, 0.76, 1, 1)
@@ -1520,8 +1526,102 @@ ScreenManager:
                     keep_ratio: False
                     source:"TurbineIcon.png"
 
+            MDGridLayout:
+                cols: 1
+                height: dp(25)
+                adaptive_height: True
+
+                MDCard:
+                    MDLabel:
+                        text: "   Turbine Inputs:"
+                        font_style: "Button"
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        pos_hint: {"x":0.10,"y":0.0}
+
+            MDGridLayout:
+                cols: 1
+                height: dp(45)
+                adaptive_height: True
+
+                MDCard:
+
+                    MDLabel:
+                        text: "   Isentropic efficiency [-]:"
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        size_hint_x : 0.45
+                        pos_hint: {"center_x":0.25,"center_y":0.5}
+
+                    MDIconButton:
+                        icon: "minus"
+                        pos_hint: {"x": 0.55, "center_y": .5}
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        on_release:
+                            root.nturb.text = "{:.2f}".format(float(root.nturb.text) - 0.01)
+                            root.nturbsldr.value = float(root.nturbsldr.value) - 0.01
+
+                    MDTextFieldRect:
+                        id: nturb
+                        text: "0.85"
+                        hint_text: "Enter value"
+                        size_hint: 0.25,0.7
+                        pos_hint: {"x":0.65,"center_y":0.5}
+                        color_mode: 'custom'
+                        multiline: False
+                        line_color_focus: (0.28, 0.39, 0.63, 1)
+
+                    MDIconButton:
+                        icon: "plus"
+                        pos_hint: {"x": 0.85, "center_y": .5}
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        on_release:
+                            root.nturb.text = "{:.2f}".format(float(root.nturb.text) + 0.01)
+                            root.nturbsldr.value = float(root.nturbsldr.value) + 0.01
+
+            MDGridLayout:
+                cols: 1
+                height: dp(40)
+                adaptive_height: True
+
+                MDCard:
+
+                    MDIconButton:
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        size_hint_x : None
+                        pos_hint: {"center_x": 0.5, "center_y": .5}
+                        icon: "restore"
+                        on_release:
+                            root.nturb.text = "{:.2f}".format(0.85)
+                            root.nturbsldr.value = 0.85
+
+                    MDSlider:
+                        id: nturbsldr
+                        min: 0.4
+                        max: 1
+                        value: 0.90
+                        size_hint_x : 0.7
+                        pos_hint: {"x":0.10}
+                        hint: False
+                        thumb_color_down: (0.28, 0.39, 0.63, 1)
+                        on_value:
+                            root.nturb.text = "{:.2f}".format(nturbsldr.value)
+
+                    MDIconButton:
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        size_hint_x : None
+                        pos_hint: {"center_x": 0.5, "center_y": .5}
+                        icon: "alpha-r-circle-outline"
+                        on_release:
+                            root.nturb.text = "{:.2f}".format(round(float(root.nturb.text), 1))
+                            root.nturbsldr.value = round(float(root.nturbsldr.value), 1)
+
             OneLineIconListItem:
-                height: dp(120)
+                height: dp(150)
                 on_release:
                     root.statepressed = 4
                     app.screen_helper.current = 'thermostate'
@@ -1549,14 +1649,14 @@ ScreenManager:
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
                     size_hint_x : 0.4
-                    pos_hint: {"x":0.35,"y":0.10}
+                    pos_hint: {"x":0.35,"center_y":0.7}
 
                 MDLabel:
                     id: t4
                     text: "None"
                     hint_text: "Enter value"
                     size_hint: 0.25,0.25
-                    pos_hint: {"x":0.75,"y":0.475}
+                    pos_hint: {"x":0.75,"center_y":0.7}
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
 
@@ -1565,13 +1665,29 @@ ScreenManager:
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
                     size_hint_x : 0.4
-                    pos_hint: {"x":0.35,"y":-0.25}
+                    pos_hint: {"x":0.35,"center_y":0.45}
 
                 MDLabel:
                     id: p4
                     text: "None"
                     size_hint: 0.25,0.25
-                    pos_hint: {"x":0.75,"y":0.125}
+                    pos_hint: {"x":0.75,"center_y":0.45}
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+
+                MDLabel:
+                    text: "Isentropic T. [C]:"
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+                    size_hint_x : 0.4
+                    pos_hint: {"x":0.35,"center_y":0.2}
+
+                MDLabel:
+                    id: t4s
+                    text: "None"
+                    hint_text: "Enter value"
+                    size_hint: 0.25,0.25
+                    pos_hint: {"x":0.75,"center_y":0.2}
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
 
@@ -2313,6 +2429,7 @@ ScreenManager:
     nth:nth
     ncarnot:ncarnot
     thermspinner:thermspinner
+    mflowres:mflowres
     orientation: "vertical"
     cols: 1
     id: thermotab3
@@ -2366,11 +2483,38 @@ ScreenManager:
 
             OneLineIconListItem:
                 MDLabel:
+                    id: wnet
+                    text: "Net Power Output : None [kW]"
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+                    size_hint: 0.9,None
+                    pos_hint: {"x":0.10,"center_y":0.5}
+                    font_size: dp(20)
+
+            OneLineIconListItem:
+                MDLabel:
+                    id: mflowres
+                    text: "Mass Flow : None [kg/s]"
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
+                    size_hint: 0.9,None
+                    pos_hint: {"x":0.10,"center_y":0.5}
+
+            OneLineIconListItem:
+                MDLabel:
                     id: pr
                     text: "Pressure Ratio : None [-]"
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
                     size_hint: 0.9,None
+                    pos_hint: {"x":0.10,"center_y":0.5}
+
+            OneLineIconListItem:
+                height: dp(10)
+                MDLabel:
+                    text: "-"*40
+                    theme_text_color: "Custom"
+                    text_color: (0.28, 0.39, 0.63, 1)
                     pos_hint: {"x":0.10,"center_y":0.5}
 
             OneLineIconListItem:
@@ -2396,15 +2540,6 @@ ScreenManager:
                 MDLabel:
                     id: win
                     text: "Pump Power Input : None [kW]"
-                    theme_text_color: "Custom"
-                    text_color: (0.28, 0.39, 0.63, 1)
-                    size_hint: 0.9,None
-                    pos_hint: {"x":0.10,"center_y":0.5}
-
-            OneLineIconListItem:
-                MDLabel:
-                    id: wnet
-                    text: "Net Power Output : None [kW]"
                     theme_text_color: "Custom"
                     text_color: (0.28, 0.39, 0.63, 1)
                     size_hint: 0.9,None

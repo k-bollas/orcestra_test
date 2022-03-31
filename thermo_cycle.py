@@ -3,9 +3,9 @@ from numpy import array, linspace, isnan
 
 class Thermodynamic_Cycle:
     def __init__(self) -> None:
-        self.Th1, self.Ph1 = 450 + 273.15, 0.989*1e5
+        self.Th1, self.Ph1 = 170 + 273.15, 0.989*1e5
         self.mh_flow = 19.2
-        self.fluid = "ETHANOL"
+        self.fluid = "ISOBUTAN"
         self.Tw1, self.Pw1 = 15 + 273.15, 101325
         self.mw_flow = 10
         self.Pinch_evap_init, self.Pinch_cond__init = 5, 5
@@ -14,6 +14,7 @@ class Thermodynamic_Cycle:
         self.subs_exh = ["N2", "CO2", "H2O", "O2"]
         self.WorkingFluidCoolProp = ["CYCLOHEX", "ETHANOL", "ISOBUTAN", "IPENTANE", "MDM", "R245FA", "TOLUENE"]
         self.WorkingFluidType = ["Dry", "Wet", "Dry","Dry", "Dry", "Dry", "Dry"]
+        self.nturb, self.npump = 0.85, 0.9
 
     def working_fluid_selection(self) -> None:
         self.P_crit, self.T_crit = tf.critical_pres(self.fluid), tf.critical_temp(self.fluid)
@@ -25,26 +26,35 @@ class Thermodynamic_Cycle:
         self.working_fluid_selection()
         self.Pinch_evap, self.Pinch_cond = self.Pinch_evap_init, self.Pinch_cond__init
         self.DoSC, self.DoSH = self.DoSC_init, self.DoSH_init
-        pinch_evap_fun = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1 , self.Ph1, tf.T_satur(x, self.fluid) + self.Pinch_evap + self.DoSH, self.y_exh, self.subs_exh, "ideal") - m_flow*tf.enthalpy_vap("mass", x, self.fluid)
-        
-        if self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1 , self.Ph1, tf.T_satur(self.P_crit*0.9, self.fluid) + self.Pinch_evap, self.y_exh, self.subs_exh, "ideal") > m_flow*tf.enthalpy_vap("mass", self.P_crit*0.9, self.fluid):
+        pinch_evap_fun = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1 , self.Ph1, tf.T_satur(x, self.fluid) + self.Pinch_evap, self.y_exh, self.subs_exh, "ideal") - m_flow*(tf.enthalpy_vap("mass", x, self.fluid) + tf.enthalpy("mass", x, tf.T_satur(x, self.fluid) + self.DoSH, x, tf.T_satur(x, self.fluid), self.fluid))
+        if self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1 , self.Ph1, tf.T_satur(self.P_crit*0.9, self.fluid) + self.Pinch_evap, self.y_exh, self.subs_exh, "ideal") > m_flow*(tf.enthalpy_vap("mass", self.P_crit*0.9, self.fluid) + tf.enthalpy("mass", self.P_crit*0.9, tf.T_satur(self.P_crit*0.9, self.fluid) + self.DoSH, self.P_crit*0.9, tf.T_satur(self.P_crit*0.9, self.fluid), self.fluid)):
+        # if self.P3 > 0.9*self.P_crit:
             self.P3 = 0.9*self.P_crit
             self.T_evap = tf.T_satur(self.P3, self.fluid)
             self.T3 = self.Th1 - self.Pinch_evap
             self.DoSH = self.T3 - self.T_evap
+            if self.DoSH < self.DoSH_init:
+                self.DoSH = self.DoSH_init
+                self.T_evap = self.T3 - self.DoSH
+                self.P3 = tf.secant(self.P_min, self.P_max, lambda x: tf.T_satur(x, self.fluid) - self.T_evap, 1e-3)[0]
             thfpp_function = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1, self.Ph1, x, self.y_exh, self.subs_exh, "ideal") - m_flow*(tf.enthalpy_vap("mass", self.P3, self.fluid) + tf.enthalpy("mass", self.P3, self.T3, self.P3, self.T_evap, self.fluid))
-            self.Thf_pp = tf.secant(self.Tw1, self.Th1, thfpp_function, 1e-3)[0]
+            self.Thf_pp = tf.alternative_secant(self.Tw1, self.Th1, thfpp_function, 1e-3, 'only_possitive')[0]
             if self.Thf_pp < self.T_evap + self.Pinch_evap:
                 self.Thf_pp = self.T_evap + self.Pinch_evap
                 T3_fun = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1, self.Ph1, self.Thf_pp, self.y_exh, self.subs_exh, "ideal") - m_flow*(tf.enthalpy_vap("mass", self.P3, self.fluid) + tf.enthalpy("mass", self.P3, x, self.P3, self.T_evap, self.fluid))
                 self.T3 = tf.secant(self.Tw1, self.Th1, T3_fun, 1e-3)[0]
                 self.DoSH = self.T3 - self.T_evap
-        else:        
-            self.P3 = tf.secant(a = self.P_min, b = self.P_max, f = pinch_evap_fun, tol = 1e-3)[0]
-            self.T3 = tf.T_satur(self.P3, self.fluid)
+        else:
+            self.P3 = tf.secant(self.P_min, self.P_max, pinch_evap_fun, 1e-3)[0]
+            # print(self.P3 - 0.9*self.P_crit, pinch_evap_fun(self.P3))      
             self.T_evap = tf.T_satur(self.P3, self.fluid)
+            self.T3 = self.T_evap + self.DoSH
+            if self.Th1 - self.T3 < self.Pinch_evap:
+                self.T3 = self.Th1 - self.Pinch_evap
+                self.T_evap = self.T3 - self.DoSH
+                self.P3 = tf.secant(self.P_min, self.P_max, lambda x: tf.T_satur(x, self.fluid) - self.T_evap, 1e-3)[0]
             thfpp_function = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1, self.Ph1, x, self.y_exh, self.subs_exh, "ideal") - m_flow*(tf.enthalpy_vap("mass", self.P3, self.fluid) + tf.enthalpy("mass", self.P3, self.T3, self.P3, self.T_evap, self.fluid))
-            self.Thf_pp = tf.secant(self.Tw1, self.Th1, thfpp_function, 1e-3)[0]
+            self.Thf_pp = tf.alternative_secant(self.Tw1, self.Th1, thfpp_function, 1e-3, 'only_possitive')[0]
         self.Z3 = tf.compressibility_factor(self.P3, self.T3, self.fluid)
 
         pinch_cond_fun = lambda x: self.mw_flow*tf.enthalpy_liquid("mass", self.Pw1, tf.T_satur(x, self.fluid) - self.Pinch_cond - self.DoSC, self.Pw1, self.Tw1, "H2O") - m_flow*tf.enthalpy_vap("mass", x, self.fluid)
@@ -53,16 +63,21 @@ class Thermodynamic_Cycle:
         self.T_cond = self.T1 + self.DoSC
 
         self.P4 = self.P1
-        self.T4 = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.entropy("mass",self.P4, x, self.P3, self.T3, self.fluid) ,tol = 1e-3)[0]
-        self.Z4 = tf.compressibility_factor(self.P4, self.T4, self.fluid)
+        self.T4s = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.entropy("mass",self.P4, x, self.P3, self.T3, self.fluid) ,tol = 1e-3)[0]
+        # print("{:.2f}".format(self.T3 - 273.15), "{:.2f}".format(self.T4s - 273.15), "{:.3f}".format(self.P3/self.P1), "{:.2f}".format(self.T1-273.15), "{:.3f}".format(m_flow))
+        self.Dh34s = tf.enthalpy("mass", self.P3, self.T3, self.P4, self.T4s, self.fluid)
+        self.T4 = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.enthalpy("mass", self.P3, self.T3, self.P4, x, self.fluid) - self.nturb*self.Dh34s ,tol = 1e-3)[0]
         self.Dh34 = tf.enthalpy("mass", self.P3, self.T3, self.P4, self.T4, self.fluid)
+        self.Z4 = tf.compressibility_factor(self.P4, self.T4, self.fluid)
         self.wout = self.Dh34
 
         self.h_ref, self.s_ref = tf.reference_data(self.fluid, 'H'), tf.reference_data(self.fluid, 'S')
         self.h1 = tf.enthalpy_liquid("mass", self.P1, self.T1, 101325, 298.15, self.fluid) + self.h_ref
         self.s1 = tf.entropy_liquid("mass", self.P1, self.T1, 101325, 298.15, self.fluid) + self.s_ref
         self.P2 = self.P3
-        self.T2 = tf.secant(self.T1,self.T3,lambda x: tf.entropy_liquid("molar",self.P2, x, self.P1, self.T1, self.fluid) ,1e-3)[0]
+        self.T2s = tf.secant(self.T1,self.T3,lambda x: tf.entropy_liquid("molar",self.P2, x, self.P1, self.T1, self.fluid) ,1e-3)[0]
+        self.Dh12s = tf.enthalpy_liquid("mass", self.P2, self.T2s, self.P1, self.T1, self.fluid)
+        self.T2 = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.enthalpy_liquid("mass", self.P2, x, self.P1, self.T1, self.fluid) - self.Dh12s/self.npump ,tol = 1e-3)[0]
         self.Dh12 = tf.enthalpy_liquid("mass", self.P2, self.T2, self.P1, self.T1, self.fluid)
         self.h2 = self.h1 + self.Dh12
         self.s2 = self.s1
@@ -120,28 +135,43 @@ class Thermodynamic_Cycle:
             self.Thf_pp = tf.secant(a = self.Tw1, b = self.Th1, f = thfpp_function, tol = 1e-3)[0]
             self.Pinch_evap = self.Thf_pp - self.T_evap
 
+        if self.DoSH < self.DoSH_init:
+            self.DoSH = self.DoSH_init
+            self.T_evap = tf.T_satur(self.P3, self.fluid)
+            self.T3 = self.T_evap + self.DoSH
+
         if self.T3 + self.Pinch_evap > self.Th1:
             self.T3 = self.Th1 - self.Pinch_evap
             p3wet_function = lambda x: tf.entropy_gas_specified('mass', x, self.fluid) + tf.entropy('mass', x, self.T3, x, tf.T_satur(x, self.fluid) , self.fluid) - tf.entropy_gas_specified('mass', self.P1, self.fluid)
             self.P3 = tf.alternative_secant(self.P_min, self.P_max, p3wet_function, 1e-3, 'only_possitive')[0]
             self.T_evap = tf.T_satur(self.P3, self.fluid)
             self.DoSH = self.T3 - self.T_evap
+            if self.DoSH < self.DoSH_init:
+                self.DoSH = self.DoSH_init
+                self.T3 = self.Th1 - self.Pinch_evap
+                self.T_evap = self.T3 - self.DoSH
+                self.P3 = tf.secant(self.P_min, self.P_max, lambda x: tf.T_satur(x, self.fluid) - self.T_evap, 1e-3)[0]
+                
         thfpp_function = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1, self.Ph1, x, self.y_exh, self.subs_exh, "ideal") - m_flow*(tf.enthalpy_vap("mass", self.P3, self.fluid) + tf.enthalpy("mass", self.P3, self.T3, self.P3, self.T_evap, self.fluid))
         self.Thf_pp = tf.secant(a = self.Tw1, b = self.Th1, f = thfpp_function, tol = 1e-3)[0]
         
         self.Z3 = tf.compressibility_factor(self.P3, self.T3, self.fluid)
 
         self.P4 = self.P1
-        self.T4 = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.entropy("mass",self.P4, x, self.P3, self.T3, self.fluid) ,tol = 1e-3)[0]
-        self.Z4 = tf.compressibility_factor(self.P4, self.T4, self.fluid)
+        self.T4s = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.entropy("mass",self.P4, x, self.P3, self.T3, self.fluid) ,tol = 1e-3)[0]
+        self.Dh34s = tf.enthalpy("mass", self.P3, self.T3, self.P4, self.T4s, self.fluid)
+        self.T4 = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.enthalpy("mass", self.P3, self.T3, self.P4, x, self.fluid) - self.nturb*self.Dh34s ,tol = 1e-3)[0]
         self.Dh34 = tf.enthalpy("mass", self.P3, self.T3, self.P4, self.T4, self.fluid)
+        self.Z4 = tf.compressibility_factor(self.P4, self.T4, self.fluid)
         self.wout = self.Dh34
 
         self.h_ref, self.s_ref = tf.reference_data(self.fluid, 'H'), tf.reference_data(self.fluid, 'S')
         self.h1 = tf.enthalpy_liquid("mass", self.P1, self.T1, 101325, 298.15, self.fluid) + self.h_ref
         self.s1 = tf.entropy_liquid("mass", self.P1, self.T1, 101325, 298.15, self.fluid) + self.s_ref
         self.P2 = self.P3
-        self.T2 = tf.secant(self.T1,self.T3,lambda x: tf.entropy_liquid("molar",self.P2, x, self.P1, self.T1, self.fluid) ,1e-3)[0]
+        self.T2s = tf.secant(self.T1,self.T3,lambda x: tf.entropy_liquid("molar",self.P2, x, self.P1, self.T1, self.fluid) ,1e-3)[0]
+        self.Dh12s = tf.enthalpy_liquid("mass", self.P2, self.T2s, self.P1, self.T1, self.fluid)
+        self.T2 = tf.secant(a = self.Tw1,b = self.Th1,f = lambda x: tf.enthalpy_liquid("mass", self.P2, x, self.P1, self.T1, self.fluid) - self.Dh12s/self.npump ,tol = 1e-3)[0]
         self.Dh12 = tf.enthalpy_liquid("mass", self.P2, self.T2, self.P1, self.T1, self.fluid)
         self.h2 = self.h1 + self.Dh12
         self.s2 = self.s1
@@ -159,7 +189,11 @@ class Thermodynamic_Cycle:
         th2_function = lambda x: self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1, self.Ph1, x, self.y_exh, self.subs_exh, "ideal") - m_flow*self.Dh23
         self.Th2 = tf.secant(a = self.Tw1, b = self.Th1, f = th2_function, tol = 1e-3)[0]
         tw2_function = lambda x: self.mw_flow*tf.enthalpy_liquid("mass", self.Pw1, x, self.Pw1, self.Tw1, "H2O") - m_flow*self.Dh41
-        self.Tw2 = tf.secant(a = self.Tw1, b = self.T4, f = tw2_function, tol = 1e-3)[0]
+        self.Tw2, self.xw2 = tf.alternative_secant(self.Tw1, self.T4, tw2_function, 1e-3)[0], 0
+        if self.Tw2 > tf.T_satur(self.Pw1, 'H2O'):
+            self.Tw2 = tf.T_satur(self.Pw1, 'H2O')
+            xw2_function = lambda x: self.mw_flow*(tf.enthalpy_liquid("mass", self.Pw1, self.Tw2, self.Pw1, self.Tw1, "H2O") + x*tf.enthalpy_vap('mass', self.Pw1, 'H2O')) - m_flow*self.Dh41
+            self.xw2 = tf.alternative_secant(0, 1, xw2_function, 1e-5)[0]
         [self.W_in, self.W_out, self.Q_in, self.Q_out] = m_flow*array([self.win, self.wout, self.qin, self.qout])
         self.W_net = self.W_out - self.W_in
         self.PR = self.P3/self.P4
@@ -169,20 +203,27 @@ class Thermodynamic_Cycle:
 
         return self.W_net, self.Th2 - self.T2
 
+    def maximum_mass_obj_func(self, x):
+        if self.WorkingFluidType[self.WorkingFluidCoolProp.index(self.fluid)] == "Dry":
+            ret = self.Cycle_Dry_States(x)[1] - self.Pinch_evap_init
+        elif self.WorkingFluidType[self.WorkingFluidCoolProp.index(self.fluid)] == "Wet":
+            ret = self.Cycle_Wet_States(x)[1] - self.Pinch_evap_init
+        return ret
+
     def maximum_mass_flow(self):
         self.DoSC, self.DoSH = self.DoSC_init, self.DoSH_init
         self.working_fluid_selection()
         self.Pinch_evap, self.Pinch_cond = self.Pinch_evap_init, self.Pinch_cond__init
-        F = lambda x: [self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1 , self.Ph1, tf.T_satur(x[1], self.fluid) + self.Pinch_evap + self.DoSH, self.y_exh, self.subs_exh, "ideal") - x[0]*tf.enthalpy_vap("mass", x[1], self.fluid),
-        self.mw_flow*tf.enthalpy_liquid("mass", self.Pw1, tf.T_satur(x[1], self.fluid) - self.Pinch_cond - self.DoSC, self.Pw1, self.Tw1, "H2O") - x[0]*tf.enthalpy_vap("mass", x[1], self.fluid)]
+        F = lambda x: [self.mh_flow*tf.enthalpy_mix("mass", self.Ph1, self.Th1 , self.Ph1, tf.T_satur(x[1], self.fluid) + self.Pinch_evap + self.DoSH, self.y_exh, self.subs_exh, "ideal") - x[0]*(tf.enthalpy_vap("mass", x[1], self.fluid) - tf.enthalpy("mass", x[0], tf.T_satur(x[0], self.fluid) + self.DoSH, x[0], tf.T_satur(x[0], self.fluid), self.fluid)),
+        self.mw_flow*tf.enthalpy_liquid("mass", self.Pw1, tf.T_satur(x[1], self.fluid) - self.Pinch_cond - self.DoSC, self.Pw1, self.Tw1, "H2O") - x[0]*(tf.enthalpy_vap("mass", x[1], self.fluid) - tf.enthalpy("mass", x[0], tf.T_satur(x[0], self.fluid) + self.DoSH, x[0], tf.T_satur(x[0], self.fluid), self.fluid))]
         x1 = array([1, self.P_min + 1/3*(self.P_max - self.P_min)])
         x2 = array([2, self.P_min + 1/2*(self.P_max - self.P_min)])
         x3 = array([5, self.P_min + 2/3*(self.P_max - self.P_min)])
         x_n = tf.general_secant(x1,x2,x3,F, 1e-6, 'only_possitive')[0]
         m_flow_max1, P3 = x_n
-        m_flow_max2 = tf.alternative_secant(0.1*m_flow_max1,0.2*m_flow_max1,lambda x: self.Cycle_Dry_States(x)[1] - self.Pinch_evap_init,1e-5)[0]
-        if m_flow_max1 < 1 and m_flow_max1 < m_flow_max2:
-            m_flow_max1 = m_flow_max2
+        m_flow_max2 = tf.alternative_secant(0.1*m_flow_max1,0.2*m_flow_max1,self.maximum_mass_obj_func,1e-5)[0]
+        # if m_flow_max1 < 1 and m_flow_max1 < m_flow_max2:
+        m_flow_max1 = m_flow_max2
         m_flow_max = min([m_flow_max1, m_flow_max2])
 
         print('PR constrain : m_max_1 = {:.3f} kg/s  ,  pinch point constrain : m_max_2 = {:.3f} kg/s'.format(m_flow_max1, m_flow_max2))
@@ -197,10 +238,11 @@ class Thermodynamic_Cycle:
             opt_func = lambda x: self.Cycle_Wet_States(x)[0]
         self.m_flow = tf.goldenOpt(a = 0.1*m_flow_max, b = 0.9*m_flow_max, f = opt_func, tol = 1e-6)[0]
 
+
         
 if __name__ == '__main__':
     tc = Thermodynamic_Cycle()
     tc.m_flow = tc.maximum_mass_flow()
-    # tc.mass_flow_sensitivity()
+    tc.mass_flow_optimisation()
     tc.m_flow = 2
     tc.Cycle_Dry_States(tc.m_flow)

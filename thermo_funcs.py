@@ -38,6 +38,8 @@ def secant(a,b,f,tol, *args):
     stepNum=0
     decims = -int(log10(tol))
     m_n = a_n - f_a_n*(b_n - a_n)/(f_b_n - f_a_n)
+    if 'show' in args:
+        print(a_n, b_n, m_n)
     f_m_n = f(m_n)
     while abs(b_n-a_n) > tol:
         f_prev = f_m_n
@@ -45,8 +47,6 @@ def secant(a,b,f,tol, *args):
         m_n = a_n - f_a_n*(b_n - a_n)/(f_b_n - f_a_n)
         f_m_n = f(m_n)
         # print(m_n, f_m_n, 50*' ')#, end='\r', flush=True)
-        if 'show' in args:
-            print(a_n, b_n, m_n)
         if abs(f_m_n) < 1e-8:
             # print("Found exact solution." , end = '\r', flush=True)
             break
@@ -70,12 +70,12 @@ def alternative_secant(x1,x2,f,tol, *args):
     stepNum = 0
     while err > tol:
         stepNum=stepNum+1
+        if 'show' in args:
+            print(x1, x2)
         A = array([[1,1],[f(x1), f(x2)]])
         B = array([[1], [0]])
         p = matmul(inv(A), B)
         x_n = float(sum([k1*k2 for k1,k2 in zip(p, [x1,x2])]))
-        if 'show' in args:
-            print(x_n, x1, x2)
         if x_n < 0 and 'only_possitive' in args:
             x_n = float(rand(1)*(x1 + x2)/2)
         err = abs(x2 - x_n)
