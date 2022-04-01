@@ -1,3 +1,4 @@
+from re import I
 from kivymd.app import MDApp
 from kivy.clock import mainthread, Clock
 from kivy.animation import Animation
@@ -36,8 +37,8 @@ from functools import partial
 
 os.environ["KIVY_NO_CONFIG"] = "1"
 
-Window.fullscreen = True
-# Window.size = (350, 650)
+# Window.fullscreen = True
+Window.size = (350, 650)
 
 class Content(MDBoxLayout):
     pass
@@ -268,23 +269,30 @@ class Thermotab3(BoxLayout, MDTabsBase):
     nth = ObjectProperty(None)
     ncar = ObjectProperty(None)
     mflowres = ObjectProperty(None)
+    loadtext = ObjectProperty(None)
+    loaddots = ObjectProperty(None)
+    loadtime = ObjectProperty(None)
     presscalculate = ObjectProperty(None)
     ThermCalcCompleted = ObjectProperty(None)
     thermotab1 = ObjectProperty(None)
     thermotab2 = ObjectProperty(None)
     thermspinner = ObjectProperty(None)
+    
     dosh_change = False
 
 
     @mainthread
     def spinner_toggle(self):
-        if self.thermspinner.active == False:
-            self.thermspinner.active = True
-        else:
-            self.thermspinner.active = False
+        # if self.thermspinner.active == False:
+        #     self.thermspinner.active = True
+        # else:
+        #     self.thermspinner.active = False
+        i, start = 1 , time.perf_counter()
+        self.event = Clock.schedule_interval(partial(self.update_label, start ), 0.2)
      
     @mainthread
     def ThermFinish(self):
+        Clock.unschedule(self.event)
         if self.Error_Type == 1:
             if self.thermotab1.WorkingFluid == None and self.thermotab2.HeatSource != None: textmsg = "Please select Working Fluid"
             elif self.thermotab1.WorkingFluid != None and self.thermotab2.HeatSource == None: textmsg = "Please select Heat Source"
@@ -303,6 +311,29 @@ class Thermotab3(BoxLayout, MDTabsBase):
         elif self.Error_Type == 0:
             self.unexpected_error(self.exc)
         else:
+            if self.Error == False:
+                if self.tc.DoSH > self.tc.DoSH_init: self.dosh_change = True
+                self.thermotab2.th2.text, self.thermotab2.ph2.text = "{:.2f}".format(self.tc.Th2-273.15), "{:.3f}".format(self.tc.Ph2/1e5)
+                self.thermotab2.tw2.text, self.thermotab2.pw2.text = "{:.2f}".format(self.tc.Tw2-273.15), "{:.3f}".format(self.tc.Pw2/1e5)
+                self.thermotab2.dosh.text, self.thermotab2.pinchevap.text = "{:.2f}".format(self.tc.DoSH), "{:.2f}".format(self.tc.Pinch_evap) 
+                self.thermotab2.t1.text, self.thermotab2.p1.text = "{:.2f}".format(self.tc.T1-273.15), "{:.3f}".format(self.tc.P1/1e5)
+                self.thermotab2.t2.text, self.thermotab2.p2.text = "{:.2f}".format(self.tc.T2-273.15), "{:.3f}".format(self.tc.P2/1e5)
+                self.thermotab2.t21.text, self.thermotab2.p21.text = "{:.2f}".format(self.tc.T2-273.15), "{:.3f}".format(self.tc.P2/1e5)
+                self.thermotab2.t3.text, self.thermotab2.p3.text = "{:.2f}".format(self.tc.T3-273.15), "{:.3f}".format(self.tc.P3/1e5)
+                self.thermotab2.t4.text, self.thermotab2.p4.text, self.thermotab2.t4s.text = "{:.2f}".format(self.tc.T4-273.15), "{:.3f}".format(self.tc.P4/1e5), "{:.2f}".format(self.tc.T4s-273.15)
+                self.thermotab2.doshsldr.value, self.thermotab2.pinchevapsldr.value = float(self.tc.DoSH), float(self.tc.Pinch_evap)
+                self.pr.text = "Pressure Ratio : {:.3f} [-]".format(self.tc.PR)
+                self.wout.text = "Turbine Power Output : {:.2f} [kW]".format(self.tc.W_out/1e3)
+                self.win.text = "Pump Power Input : {:.2f} [kW]".format(self.tc.W_in/1e3); 
+                self.wnet.text = "Net Power Output : {:.2f} [kW]".format(self.tc.W_net/1e3)
+                self.qin.text = "Heat Duty : {:.2f} [kW]".format(self.tc.Q_in/1e3)
+                self.nth.text = "Thermal Efficiency : {:.2f} [%]".format(self.tc.nth*1e2)
+                self.mflowres.text = "Mass Flow : {:.2f} [kg/s]".format(self.tc.m_flow)
+                self.ncarnot.text = "Carnot Efficiency : {:.2f} [%]".format(self.tc.n_carnot*1e2)
+                self.thermotab1.mflow.text = "{:.2f}".format(self.tc.m_flow)
+                self.thermotab1.mflowsldr.value = float(self.tc.m_flow)
+                self.ThermCalcCompleted = 'Completed'
+
             self.snackbar = Snackbar(text="Calculations completed!",snackbar_x=dp(0),snackbar_y=dp(10), duration=0.2)
             self.snackbar.open()
             if self.dosh_change == True:
@@ -314,15 +345,15 @@ class Thermotab3(BoxLayout, MDTabsBase):
         self.snackbar_dosh.open()
 
     def ThermCalculations(self):
-        Error = False
+        self.Error = False
         self.Error_Type = None
         self.dosh_change = False
         try:
             if self.thermotab1.WorkingFluid == None or self.thermotab2.HeatSource == None:
                 self.Error_Type = 1   
-                Error = True
+                self.Error = True
 
-            if Error == False:
+            if self.Error == False:
                 self.tc = Thermodynamic_Cycle()
                 self.tc.Th1, self.tc.Ph1 = float(self.thermotab2.th1.text) + 273.15, float(self.thermotab2.ph1.text)*1e5
                 self.tc.mh_flow = float(self.thermotab2.mhflow.text)
@@ -346,37 +377,15 @@ class Thermotab3(BoxLayout, MDTabsBase):
                             self.tc.Cycle_Wet_States(self.tc.m_flow)
                     else:
                         self.Error_Type = 2
-                        Error = True
-            if Error == False:
-                if self.tc.DoSH > self.tc.DoSH_init: self.dosh_change = True
-                self.thermotab2.th2.text, self.thermotab2.ph2.text = "{:.2f}".format(self.tc.Th2-273.15), "{:.3f}".format(self.tc.Ph2/1e5)
-                self.thermotab2.tw2.text, self.thermotab2.pw2.text = "{:.2f}".format(self.tc.Tw2-273.15), "{:.3f}".format(self.tc.Pw2/1e5)
-                self.thermotab2.dosh.text, self.thermotab2.pinchevap.text = "{:.2f}".format(self.tc.DoSH), "{:.2f}".format(self.tc.Pinch_evap) 
-                self.thermotab2.t1.text, self.thermotab2.p1.text = "{:.2f}".format(self.tc.T1-273.15), "{:.3f}".format(self.tc.P1/1e5)
-                self.thermotab2.t2.text, self.thermotab2.p2.text = "{:.2f}".format(self.tc.T2-273.15), "{:.3f}".format(self.tc.P2/1e5)
-                self.thermotab2.t21.text, self.thermotab2.p21.text = "{:.2f}".format(self.tc.T2-273.15), "{:.3f}".format(self.tc.P2/1e5)
-                self.thermotab2.t3.text, self.thermotab2.p3.text = "{:.2f}".format(self.tc.T3-273.15), "{:.3f}".format(self.tc.P3/1e5)
-                self.thermotab2.t4.text, self.thermotab2.p4.text, self.thermotab2.t4s.text = "{:.2f}".format(self.tc.T4-273.15), "{:.3f}".format(self.tc.P4/1e5), "{:.2f}".format(self.tc.T4s-273.15)
-                self.thermotab2.doshsldr.value, self.thermotab2.pinchevapsldr.value = float(self.tc.DoSH), float(self.tc.Pinch_evap)
-                self.pr.text = "Pressure Ratio : {:.3f} [-]".format(self.tc.PR)
-                self.wout.text = "Turbine Power Output : {:.2f} [kW]".format(self.tc.W_out/1e3)
-                self.win.text = "Pump Power Input : {:.2f} [kW]".format(self.tc.W_in/1e3); 
-                self.wnet.text = "Net Power Output : {:.2f} [kW]".format(self.tc.W_net/1e3)
-                self.qin.text = "Heat Duty : {:.2f} [kW]".format(self.tc.Q_in/1e3)
-                self.nth.text = "Thermal Efficiency : {:.2f} [%]".format(self.tc.nth*1e2)
-                self.mflowres.text = "Mass Flow : {:.2f} [kg/s]".format(self.tc.m_flow)
-                self.ncarnot.text = "Carnot Efficiency : {:.2f} [%]".format(self.tc.n_carnot*1e2)
-                self.thermotab1.mflow.text = "{:.2f}".format(self.tc.m_flow)
-                self.thermotab1.mflowsldr.value = float(self.tc.m_flow)
-                self.ThermCalcCompleted = 'Completed'
+                        self.Error = True
 
         except Exception as exc:
             self.exc = exc
-            Error = True
+            self.Error = True
             self.Error_Type = 0
 
         self.ThermFinish()
-        self.spinner_toggle()
+        # self.spinner_toggle()
 
     def unexpected_error(self, exc):
         self.dialog = MDDialog(
@@ -397,7 +406,17 @@ class Thermotab3(BoxLayout, MDTabsBase):
             self.spinner_toggle()
             self.therm_thread = threading.Thread(target=(self.ThermCalculations))
             self.therm_thread.start()
-              
+            # while self.therm_thread.is_alive():
+            #     pass
+                # self.loaddots.text = "..."*i
+
+            
+    def update_label(self, start, *largs):
+            i = int(len(self.loaddots.text)/3)
+            i = i + 1 if i < 5 else 1
+            self.loaddots.text = "..."*i
+            end = time.perf_counter()
+            self.loadtime.text = "{:.2f} secs".format(end - start)
             
     def reset_button(self,obj) -> None:
         self.thermotab2.dosh.text = "{:.2f}".format(0)

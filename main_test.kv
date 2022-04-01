@@ -2430,6 +2430,9 @@ ScreenManager:
     ncarnot:ncarnot
     thermspinner:thermspinner
     mflowres:mflowres
+    loadtext:loadtext
+    loaddots:loaddots
+    loadtime:loadtime
     orientation: "vertical"
     cols: 1
     id: thermotab3
@@ -2471,6 +2474,40 @@ ScreenManager:
                     pos_hint: {"center_x":0.5,"center_y":0.5}
                     on_release:
                         root.ThermCalculations_thread()
+
+            MDGridLayout:
+                cols: 1
+                height: dp(40)
+                adaptive_height: True
+
+                MDCard:
+                    
+                    MDLabel:
+                        id:loadtext
+                        text: "     Loading: "
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        size_hint_x : 0.35
+                        pos_hint: {"x":0.15,"y":0.05}
+
+                    MDLabel:
+                        id:loaddots
+                        text: "... "
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        size_hint_x : 0.35
+                        pos_hint: {"x":0.15,"y":0.05}
+
+                    MDLabel:
+                        id:loadtime
+                        text: "0 secs"
+                        theme_text_color: "Custom"
+                        text_color: (0.28, 0.39, 0.63, 1)
+                        size_hint_x : 0.35
+                        pos_hint: {"x":0.15,"y":0.05}
+                    
+
+
 
             OneLineIconListItem:
                 height: dp(30)
